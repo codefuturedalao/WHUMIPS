@@ -41,11 +41,39 @@ module DECODER(
 	assign o_reg1_addr = i_inst[25:21];
 	assign o_reg2_addr = i_inst[20:16];
 	assign o_imm26 = i_inst[25:0];
-	wire opcode = i_inst[31:26];	
+	wire [5:0] opcode = i_inst[31:26];	
+	wire [5:0] imm5_0 = i_inst[5:0];
 	always
 		@(*) begin
 			case(opcode)
-				
+				o_reg1_read <= `REG_READ;
+				o_reg2_read <= `REG_READ;
+				o_reg3_addr <= i_inst[15:11];
+				o_aluop <= 6'b000_000;
+				o_jump <= `NO_JUMP;
+				o_jump_src <= `JUMP_FROM_REG;
+				o_branch <= `NO_BRANCH;
+				o_mem_write <= `MEM_NO_WRITE;
+				o_mem_read <= `MEM_NO_READ;
+				o_result_or_mem <= `REG3_FROM_RESULT;
+				o_reg3_write <= `REG3_WRITE;
+				`SPECIAL_OPCODE: begin
+					case(imm5_0)
+						`ADD_OPCODE: begin
+							o_aluop <= ADD_ALU_OPCODE;
+						end
+						`ADDU_OPCODE: begin
+							o_aluop <= ADDU_ALU_OPCODE;
+						end	
+						`SUB_OPCODE: begin
+							o_aluop <= SUB_ALU_OPCODE;	
+						end
+						`SUBU_OPCODE: begin	
+							o_aluop <= SUBU_ALU_OPCODE;
+						end
+					endcase
+				end
+			endcase 
 		end
 
 endmodule
