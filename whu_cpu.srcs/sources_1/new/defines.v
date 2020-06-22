@@ -2,48 +2,6 @@
 `define REG_ADDR_WIDTH 4:0
 `define ALUOP_WIDTH 5:0
 
-/*opcode defines*/
-//arith and logic
-`define SPECIAL_OPCODE 6'b000000
-`define ADD_OPCODE 6'b100000		//inst[5:0]
-`define ADDU_OPCODE 6'b100001
-`define SUB_OPCODE 6'b100010
-`define SUBU_OPCODE 6'b100011
-
-`define ADDI_OPCODE 6'b001000
-`define ADDIU_OPCODE 6'b001001
-`define SLTI_OPCODE 6'b001010
-`define SLTIU_OPCODE 6'b001011
-`define ANDI_OPCODE 6'b001100
-`define LUI_OPCODE 6'b001111
-`define ORI_OPCODE 6'b001101
-`define XORI_OPCODE 6'b001110
-//branch
-`define BEQ_OPCODE 6'b000100
-`define BNE_OPCODE 6'b000101
-`define BGEZ_OPCODE 6'b000001
-`define BGTZ_OPCODE 6'b000111
-`define BLEZ_OPCODE 6'b000110
-`define BLTZ_OPCODE 6'b000001  //the same as BGEZ, the diff is 20:15 field
-`define BGEZAL_OPCODE 6'b000001 //the same as BGEZ, the diff is 20:15 field
-`define
-`define BLTZAL_OPCODE 6'b000001 //the same
-`define J_OPCODE 6'b000010
-`define JAL_OPCODE 6'b000011
-//load & store
-`define LB_OPCODE 6'b100000
-`define LBU_OPCODE 6'b100100
-`define LH_OPCODE 6'b100001
-`define LHU_OPCODE 6'b100101
-`define LW_OPCODE 6'b100011
-`define SB_OPCODE 6'b101000
-`define SH_OPCODE 6'b101001
-`define SW_OPCODE 6'b101011
-`define ERET_OPCODE 6'b010000
-`define MFC0_OPCODE 6'b010000 //the same as ERET,
-`define MTC0_OPCODE 6'b010000 //the same as ERET,
- 
-
 /*control signal*/
 `define REG_READ 1'b1
 `define REG_NO_READ 1'b0
@@ -57,13 +15,157 @@
 `define MEM_NO_WRITE 1'b0
 `define MEM_READ 1'b1
 `define MEM_NO_READ 1'b0
+`define MEM_SE_BYTE 2'b00
+`define MEM_SE_HALF 2'b01
+`define MEM_SE_WORD 2'b10
 `define REG3_FROM_RESULT 1'b1
 `define REG3_FROM_MEM 1'b0
 `define REG3_WRITE 1'b1
 `define REG3_NO_WRITE 1'b0
 
+//
+`define ZERO_WORD 32'b0000_0000_0000_0000_0000_0000_0000_0000;
+
+/*    --------------- ID stage ----------------    */
+/*opcode defines*/
+/*special op*/
+//arith and logic
+`define SPECIAL_OPCODE 6'b000000
+`define ADD_OPCODE 6'b100000		//inst[5:0]
+`define ADDU_OPCODE 6'b100001
+`define SUB_OPCODE 6'b100010
+`define SUBU_OPCODE 6'b100011
+`define SLT_OPCODE 6'b101010
+`define SLTU_OPCODE 6'b101011
+`define DIV_OPCODE 6'b011010
+`define DIVU_OPCODE 6'b011011
+`define MULT_OPCODE 6'b011000
+`define MULTU_OPCODE 6'b011001
+`define AND_OPCODE 6'b100100
+`define NOR_OPCODE 6'b100111
+`define OR_OPCODE 6'b100101
+`define XOR_OPCODE 6'b100110
+`define SLLV_OPCODE 6'b000100
+`define SLL_OPCODE 6'b000000
+`define SRAV_OPCODE 6'b000111
+`define SRA_OPCODE 6'b000011
+`define SRLV_OPCODE 6'b000110
+`define SRL_OPCODE 6'b000010
+//jump
+`define JR_OPCODE 6'b001000
+`define JALR_OPCODE 6'b0010001
+//memory
+`define MFHI_OPCODE 6'b010000
+`define MFLO_OPCODE 6'b010010
+`define MTHI_OPCODE 6'b010001
+`define MTLO_OPCODE 6'b010011
+/*I type op*/
+`define ADDI_OPCODE 6'b001000
+`define ADDIU_OPCODE 6'b001001
+`define SLTI_OPCODE 6'b001010
+`define SLTIU_OPCODE 6'b001011
+`define ANDI_OPCODE 6'b001100
+`define LUI_OPCODE 6'b001111
+`define ORI_OPCODE 6'b001101
+`define XORI_OPCODE 6'b001110
+//load & store
+`define LB_OPCODE 6'b100000
+`define LBU_OPCODE 6'b100100
+`define LH_OPCODE 6'b100001
+`define LHU_OPCODE 6'b100101
+`define LW_OPCODE 6'b100011
+`define SB_OPCODE 6'b101000
+`define SH_OPCODE 6'b101001
+`define SW_OPCODE 6'b101011
+/*J type op*/
+`define BEQ_OPCODE 6'b000100
+`define BNE_OPCODE 6'b000101
+/*BGELTZ op*/
+`define BGELTZ_OPCODE 6'b000001
+`define BGEZ_OPCODE 5'b00001
+`define BLTZ_OPCODE 5'b00000
+`define BGEZAL 5'b10001
+`define BLTZAL 5'b10000
+
+`define BGTZ_OPCODE 6'b000111
+`define BLEZ_OPCODE 6'b000110
+`define J_OPCODE 6'b000010
+`define JAL_OPCODE 6'b000011
+//trap
+`define BREAK_OPCODE 6'b001101
+`define SYS_OPCODE 6'b001100
+/*privileged op*/
+`define PRIV_OPCODE 6'b010000
+`define ERET_OPCODE 6'b10000
+`define MFC0_OPCODE 6'b00000 
+`define MTC0_OPCODE 6'b00100
+ 
+
+/*    --------------- EX stage ----------------    */
 /*ALU OPCODE*/
-`define ADD_ALU_OPCODE 6'b000000
-`define ADDU_ALU_OPCODE 6'b000001
-`define SUB_ALU_OPCODE 6'b000010
-`define SUBU_ALU_OPCODE 6'b000011
+// R type op
+`define NOP_ALU_OPCODE 6'b000000
+`define ADD_ALU_OPCODE 6'b000001
+`define ADDU_ALU_OPCODE 6'b000010
+`define SUB_ALU_OPCODE 6'b000011
+`define SUBU_ALU_OPCODE 6'b000100
+`define SLT_ALU_OPCODE 6'b000101
+`define SLTU_ALU_OPCODE 6'b000110
+`define DIV_ALU_OPCODE 6'b000111
+`define DIVU_ALU_OPCODE 6'b001000
+`define MULT_ALU_OPCODE 6'b001001
+`define MULTU_ALU_OPCODE 6'b001010
+`define AND_ALU_OPCODE 6'b001011
+`define NOR_ALU_OPCODE 6'b001100
+`define OR_ALU_OPCODE 6'b001101
+`define XOR_ALU_OPCODE 6'b001110
+`define SLLV_ALU_OPCODE 6'b001111
+`define SLL_ALU_OPCODE 6'b010000
+`define SRAV_ALU_OPCODE 6'b010001
+`define SRA_ALU_OPCODE 6'b010010
+`define SRLV_ALU_OPCODE 6'b010011
+`define SRL_ALU_OPCODE 6'b010100
+// I type op
+`define ADDI_ALU_OPCODE 6'b010101
+`define ADDIU_ALU_OPCODE 6'b010110
+`define SLTI_ALU_OPCODE 6'b010111
+`define SLTIU_ALU_OPCODE 6'b011000
+`define ANDI_ALU_OPCODE 6'b011001
+`define LUI_ALU_OPCODE 6'b011010
+`define ORI_ALU_OPCODE 6'b011011
+`define XORI_ALU_OPCODE 6'b011100
+//load & store
+`define LB_ALU_OPCODE 6'b010110  //the same as addiu
+`define LBU_ALU_OPCODE 6'b010110 //the same as addiu 
+`define LH_ALU_OPCODE 6'b100111
+`define LHU_ALU_OPCODE 6'b100111 //the same as LH
+`define LW_ALU_OPCODE 6'b101000 
+
+`define SB_ALU_OPCODE 6'b010110  //the same as addiu
+`define SH_ALU_OPCODE 6'b100111 //the same as LH
+`define SW_ALU_OPCODE 6'b101000 //the same as LW
+// J type op
+`define BEQ_ALU_OPCODE 6'b011101
+`define BNE_ALU_OPCODE 6'b011110
+`define BGEZ_ALU_OPCODE 6'b011111
+`define BGTZ_ALU_OPCODE 6'b100000
+`define BLEZ_ALU_OPCODE 6'b100001
+`define BLTZ_ALU_OPCODE 6'b100010
+`define BGEZAL_ALU_OPCODE 6'b100011
+`define BLTZAL_ALU_OPCODE 6'b100100
+`define J_ALU_OPCODE 6'b000000 //the same as nop alu opcode
+`define JAL_ALU_OPCODE 6'b100101
+`define JR_ALU_OPCODE 6'b000000
+`define JALR_ALU_OPCODE 6'b100110
+// HI/LO op
+`define MFHI_ALU_OPCODE 6'b000000
+`define MFLO_ALU_OPCODE 6'b000000
+`define MTHI_ALU_OPCODE 6'b000000
+`define MTLO_ALU_OPCODE 6'b000000
+// trap
+`define BREAK_ALU_OPCODE 6'b000000
+`define SYS_ALU_OPCODE 6'b000000
+//privileged op
+`define ERET_ALU_OPCODE 6'b000000
+`define MFC0_ALU_OPCODE 6'b000000
+`define MTC0_ALU_OPCODE 6'b000000
