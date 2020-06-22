@@ -1,8 +1,12 @@
 `define INST_WIDTH 31:0
 `define REG_ADDR_WIDTH 4:0
+`define REG_WIDTH 31:0
+`define REG_NUM 31:0
 `define ALUOP_WIDTH 5:0
 
 /*control signal*/
+`define RST_ENABLE 1'b1
+`define RST_DISABLE 1'b0
 `define REG_READ 1'b1
 `define REG_NO_READ 1'b0
 `define IS_JUMP 1'b1
