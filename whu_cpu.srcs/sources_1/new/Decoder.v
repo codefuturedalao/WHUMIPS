@@ -6,7 +6,7 @@
 // 
 // Create Date: 05/27/2020 12:33:19 AM
 // Design Name: 
-// Module Name: DECODER
+// Module Name: Decoder
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -21,13 +21,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module DECODER(
+module Decoder(
     input [`INST_WIDTH] i_inst,  
     output reg o_reg1_read,
 	output reg o_reg2_read,
 	output wire [`REG_ADDR_WIDTH] o_reg1_addr,
 	output wire [`REG_ADDR_WIDTH] o_reg2_addr,
-	output reg [`REG_ADDR_WIDTH} o_reg3_addr,
+	output reg [`REG_ADDR_WIDTH] o_reg3_addr,
 	output reg [`ALUOP_WIDTH] o_aluop,
 	output wire [25:0] o_imm26,
 	output reg o_jump,
@@ -35,7 +35,7 @@ module DECODER(
 	output reg o_branch,
 	output reg o_mem_write,
 	output reg o_mem_read,
-	output reg[1:0] o_mem_byte_se;
+	output reg[1:0] o_mem_byte_se,
 	output reg o_result_or_mem,
 	output reg o_reg3_write
     );
@@ -49,26 +49,26 @@ module DECODER(
 /*arth and logical*/
 	always
 		@(opcode) begin
+            o_reg1_read <= `REG_READ;
+            o_reg2_read <= `REG_READ;
+            o_reg3_addr <= i_inst[15:11];
+            o_aluop <= `NOP_ALU_OPCODE;
+            o_jump <= `NO_JUMP;
+            o_jump_src <= `JUMP_FROM_REG;
+            o_branch <= `NO_BRANCH;
+            o_mem_write <= `MEM_NO_WRITE;
+            o_mem_read <= `MEM_NO_READ;
+            o_mem_byte_se <= `MEM_SE_BYTE;
+            o_result_or_mem <= `REG3_FROM_RESULT;
+            o_reg3_write <= `REG3_WRITE;
 			case(opcode)
-				o_reg1_read <= `REG_READ;
-				o_reg2_read <= `REG_READ;
-				o_reg3_addr <= i_inst[15:11];
-				o_aluop <= `NOP_ALU_OPCODE;
-				o_jump <= `NO_JUMP;
-				o_jump_src <= `JUMP_FROM_REG;
-				o_branch <= `NO_BRANCH;
-				o_mem_write <= `MEM_NO_WRITE;
-				o_mem_read <= `MEM_NO_READ;
-				o_mem_byte_se <= `MEM_SE_BYTE;
-				o_result_or_mem <= `REG3_FROM_RESULT;
-				o_reg3_write <= `REG3_WRITE;
 				`ADDI_OPCODE: begin
-					o_aluop <= ADDI_ALU_OPCODE;
+					o_aluop <= `ADDI_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
 				end
 				`ADDIU_OPCODE: begin
-					o_aluop <= `ADDIO_ALU_OPCODE;
+					o_aluop <= `ADDIU_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
 				end
@@ -196,22 +196,22 @@ module DECODER(
 				//o_reg3_write <= `REG3_WRITE;
 				`BEQ_OPCODE: begin
 					o_aluop <= `BEQ_ALU_OPCODE;
-					o_branch <= `BRANCH;
+					o_branch <= `IS_BRANCH;
 					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				`BNE_OPCODE: begin
 					o_aluop <= `BNE_ALU_OPCODE;
-					o_branch <= `BRANCH;
+					o_branch <= `IS_BRANCH;
 					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				`BGTZ_OPCODE: begin
 					o_aluop <= `BGTZ_ALU_OPCODE;
-					o_branch <= `BRANCH;
+					o_branch <= `IS_BRANCH;
 					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				`BLEZ_OPCODE: begin
 					o_aluop <= `BLEZ_ALU_OPCODE;
-					o_branch <= `BRANCH;
+					o_branch <= `IS_BRANCH;
 					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				`J_OPCODE: begin
@@ -235,26 +235,26 @@ module DECODER(
 						`BGEZ_OPCODE: begin
 							o_aluop <= `BGEZ_ALU_OPCODE;
 							o_reg2_read <= `REG_NO_READ;
-							o_branch <= `BRANCH;
+							o_branch <= `IS_BRANCH;
 							o_reg3_write <= `REG3_NO_WRITE;
 						end
 						`BLTZ_OPCODE: begin
 							o_aluop <= `BLTZ_ALU_OPCODE;
 							o_reg2_read <= `REG_NO_READ;
-							o_branch <= `BRANCH;
+							o_branch <= `IS_BRANCH;
 							o_reg3_write <= `REG3_NO_WRITE;
 						end
 						`BGEZAL_OPCODE: begin
 							o_aluop <= `BGEZAL_ALU_OPCODE;
 							o_reg2_read <= `REG_NO_READ;
 							o_reg3_addr <= 5'b11111;
-							o_branch <= `BRANCH;
+							o_branch <= `IS_BRANCH;
 						end
 						`BLTZAL_OPCODE: begin
 							o_aluop <= `BLTZAL_ALU_OPCODE;
 							o_reg2_read <= `REG_NO_READ;
 							o_reg3_addr <= 5'b11111;
-							o_branch <= `BRANCH;
+							o_branch <= `IS_BRANCH;
 						end
 					endcase
 				end
@@ -296,57 +296,57 @@ module DECODER(
 				//o_result_or_mem <= `REG3_FROM_RESULT; //it doesn't matter bec reg3 no write
 				//o_reg3_write <= `REG3_WRITE;
 				`LB_OPCODE: begin
-					o_aluop <= LB_ALU_OPCODE;
+					o_aluop <= `LB_ALU_OPCODE;
 					o_mem_read <= `MEM_READ;
 					o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 				end	
 				`LBU_OPCODE: begin
-					o_aluop <= LBU_ALU_OPCODE;
+					o_aluop <= `LBU_ALU_OPCODE;
 					o_mem_read <= `MEM_READ;
 					o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 				end	
 				`LH_OPCODE: begin
-					o_aluop <= LH_ALU_OPCODE;
+					o_aluop <= `LH_ALU_OPCODE;
 					o_mem_read <= `MEM_READ;
 					o_mem_byte_se <= `MEM_SE_HALF;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 				end	
 				`LHU_OPCODE: begin
-					o_aluop <= LHU_ALU_OPCODE;
+					o_aluop <= `LHU_ALU_OPCODE;
 					o_mem_read <= `MEM_READ;
 					o_mem_byte_se <= `MEM_SE_HALF;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 				end	
 				`LW_OPCODE: begin
-					o_aluop <= LW_ALU_OPCODE;
+					o_aluop <= `LW_ALU_OPCODE;
 					o_mem_read <= `MEM_READ;
 					o_mem_byte_se <= `MEM_SE_WORD;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 				end	
 				`SB_OPCODE: begin
-					o_aluop <= SB_ALU_OPCODE;
+					o_aluop <= `SB_ALU_OPCODE;
 					o_mem_write <= `MEM_WRITE;
 					o_mem_byte_se <= `MEM_SE_BYTE;
-					o_reg3_write <= `REG_NO_WRITE;
+					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				`SH_OPCODE: begin
-					o_aluop <= SH_ALU_OPCODE;
+					o_aluop <= `SH_ALU_OPCODE;
 					o_mem_write <= `MEM_WRITE;
 					o_mem_byte_se <= `MEM_SE_BYTE;
-					o_reg3_write <= `REG_NO_WRITE;
+					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				`SW_OPCODE: begin
-					o_aluop <= SW_ALU_OPCODE;
+					o_aluop <= `SW_ALU_OPCODE;
 					o_mem_write <= `MEM_WRITE;
 					o_mem_byte_se <= `MEM_SE_BYTE;
-					o_reg3_write <= `REG_NO_WRITE;
+					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				default: begin
 					//nothing
