@@ -1,4 +1,5 @@
 `define INST_WIDTH 31:0
+`define INST_ADDR_WIDTH 31:0
 `define REG_ADDR_WIDTH 4:0
 `define REG_WIDTH 31:0
 `define REG_NUM 31:0
@@ -18,6 +19,8 @@
 `define JUMP_FROM_IMM 1'b0
 `define IS_BRANCH 1'b1
 `define NO_BRANCH 1'b0
+`define IS_EXCEPTION 1'b1
+`define NO_EXCEPTION 1'b0
 `define MEM_WRITE 1'b1
 `define MEM_NO_WRITE 1'b0
 `define MEM_READ 1'b1

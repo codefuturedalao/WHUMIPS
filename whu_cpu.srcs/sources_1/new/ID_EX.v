@@ -42,6 +42,7 @@ module ID_EX(
 	input wire i_id_mem_read,
 	input wire i_id_result_or_mem,
 	input wire i_id_reg3_write,
+	input wire [`INST_ADDR_WIDTH] i_id_pc,
 
 	output reg [`REG_ADDR_WIDTH] o_ex_reg1_addr,
 	output reg [`REG_ADDR_WIDTH] o_ex_reg2_addr,
@@ -58,7 +59,8 @@ module ID_EX(
 	output reg o_ex_mem_write,
 	output reg o_ex_mem_read,
 	output reg o_ex_result_or_mem,
-	output reg o_ex_reg3_write
+	output reg o_ex_reg3_write,
+	output reg [`INST_ADDR_WIDTH] o_ex_pc
     );
 	always
 		@(posedge i_clk) begin
@@ -77,6 +79,7 @@ module ID_EX(
 				o_ex_mem_read <= `MEM_NO_READ;
 				o_ex_result_or_mem <= `REG3_FROM_MEM;
 				o_ex_reg3_write <= `REG3_NO_WRITE;
+				o_ex_pc <= `ZERO_WORD;
 			end
 			else if(i_flush == `IS_FLUSH || (i_stall[2] == 1'b1 && i_stall[3] == 1'b0)) begin
 				o_ex_reg1_read <= `REG_NO_READ;
@@ -93,6 +96,7 @@ module ID_EX(
 				o_ex_mem_read <= `MEM_NO_READ;
 				o_ex_result_or_mem <= `REG3_FROM_MEM;
 				o_ex_reg3_write <= `REG3_NO_WRITE;
+				o_ex_pc <= `ZERO_WORD;
 			end 
 			else if(i_stall[2] == 1'b1 && i_stall[3] == 1'b1) begin
 				//keep the original value
@@ -112,6 +116,7 @@ module ID_EX(
 				o_ex_mem_read <= i_id_mem_read;
 				o_ex_result_or_mem <= i_id_result_or_mem;
 				o_ex_reg3_write <= i_id_reg3_write;
+				o_ex_pc <= i_id_pc;
 			end
 		end
 endmodule
