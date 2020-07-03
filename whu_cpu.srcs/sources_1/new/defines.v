@@ -5,6 +5,7 @@
 `define REG_NUM 31:0
 `define ALUOP_WIDTH 5:0
 `define STALL_WIDTH 5:0
+`define DEFAULT_PC 32'h0000_0000
 
 /*control signal*/
 `define RST_ENABLE 1'b1
