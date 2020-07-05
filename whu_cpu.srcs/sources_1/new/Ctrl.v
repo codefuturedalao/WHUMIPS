@@ -29,7 +29,6 @@ module Ctrl(
 	input wire i_mem_reg3_write,
 	input wire i_mem_result_or_mem,  //represent load instruction
 	input wire [`REG_ADDR_WIDTH] i_wb_reg3_addr,
-	input wire [`REG_ADDR_WIDTH] i_wb_reg3_addr,
 	input wire i_wb_reg3_write,
 	input wire i_jump_branch,
 	
