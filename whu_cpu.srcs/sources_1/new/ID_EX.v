@@ -38,8 +38,9 @@ module ID_EX(
 	input wire i_id_jump,
 	input wire i_id_jump_src,
 	input wire i_id_branch,
-	input wire i_id_mem_write,
-	input wire i_id_mem_read,
+	input wire [3:0] i_id_mem_wen,
+	input wire i_id_mem_en,
+	input wire [2:0] i_id_mem_byte_se,
 	input wire i_id_result_or_mem,
 	input wire i_id_reg3_write,
 	input wire [`INST_ADDR_WIDTH] i_id_pc,
@@ -56,8 +57,9 @@ module ID_EX(
 	output reg o_ex_jump,
 	output reg o_ex_jump_src,
 	output reg o_ex_branch,
-	output reg o_ex_mem_write,
-	output reg o_ex_mem_read,
+	output reg [3:0] o_ex_mem_wen,
+	output reg o_ex_mem_en,
+	output reg [2:0] o_ex_mem_byte_se,
 	output reg o_ex_result_or_mem,
 	output reg o_ex_reg3_write,
 	output reg [`INST_ADDR_WIDTH] o_ex_pc
@@ -75,8 +77,9 @@ module ID_EX(
 				o_ex_jump <= `NO_JUMP;
 				o_ex_jump_src <= `JUMP_FROM_IMM;
 				o_ex_branch <= `NO_BRANCH;
-				o_ex_mem_write <= `MEM_NO_WRITE;
-				o_ex_mem_read <= `MEM_NO_READ;
+				o_ex_mem_wen <= 4'b0000;
+				o_ex_mem_en <= `MEM_DISABLE;
+				o_ex_mem_byte_se <= `MEM_SE_BYTE_U;
 				o_ex_result_or_mem <= `REG3_FROM_MEM;
 				o_ex_reg3_write <= `REG3_NO_WRITE;
 				o_ex_pc <= `ZERO_WORD;
@@ -92,8 +95,9 @@ module ID_EX(
 				o_ex_jump <= `NO_JUMP;
 				o_ex_jump_src <= `JUMP_FROM_IMM;
 				o_ex_branch <= `NO_BRANCH;
-				o_ex_mem_write <= `MEM_NO_WRITE;
-				o_ex_mem_read <= `MEM_NO_READ;
+				o_ex_mem_wen <= 4'b0000;
+				o_ex_mem_en <= `MEM_DISABLE;
+				o_ex_mem_byte_se <= `MEM_SE_BYTE_U;
 				o_ex_result_or_mem <= `REG3_FROM_MEM;
 				o_ex_reg3_write <= `REG3_NO_WRITE;
 				o_ex_pc <= `ZERO_WORD;
@@ -112,8 +116,9 @@ module ID_EX(
 				o_ex_jump <= i_id_jump;
 				o_ex_jump_src <= i_id_jump_src;
 				o_ex_branch <= i_id_branch;
-				o_ex_mem_write <= i_id_mem_write;
-				o_ex_mem_read <= i_id_mem_read;
+				o_ex_mem_wen <= i_id_mem_wen;
+				o_ex_mem_en <= i_id_mem_en;
+				o_ex_mem_byte_se <= i_id_mem_byte_se;
 				o_ex_result_or_mem <= i_id_result_or_mem;
 				o_ex_reg3_write <= i_id_reg3_write;
 				o_ex_pc <= i_id_pc;

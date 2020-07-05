@@ -33,9 +33,9 @@ module Decoder(
 	output reg o_jump,
 	output reg o_jump_src,
 	output reg o_branch,
-	output reg o_mem_write,
-	output reg o_mem_read,
-	output reg[1:0] o_mem_byte_se,
+	output reg o_mem_en,   
+	output reg [3:0] o_mem_wen,	//write enable 
+	output reg [2:0] o_mem_byte_se,
 	output reg o_result_or_mem,
 	output reg o_reg3_write
     );
@@ -56,9 +56,6 @@ module Decoder(
             o_jump <= `NO_JUMP;
             o_jump_src <= `JUMP_FROM_REG;
             o_branch <= `NO_BRANCH;
-            o_mem_write <= `MEM_NO_WRITE;
-            o_mem_read <= `MEM_NO_READ;
-            o_mem_byte_se <= `MEM_SE_BYTE;
             o_result_or_mem <= `REG3_FROM_RESULT;
             o_reg3_write <= `REG3_WRITE;
 			case(opcode)
@@ -191,7 +188,6 @@ module Decoder(
 				//o_jump_src <= `JUMP_FROM_REG;
 				//o_branch <= `NO_BRANCH;
 				//o_mem_write <= `MEM_NO_WRITE;
-				//o_mem_read <= `MEM_NO_READ;
 				//o_result_or_mem <= `REG3_FROM_RESULT; //it doesn't matter bec reg3 no write
 				//o_reg3_write <= `REG3_WRITE;
 				`BEQ_OPCODE: begin
@@ -283,6 +279,9 @@ module Decoder(
 /*load and store*/
 	always
 		@(opcode) begin
+			o_mem_en <= `MEM_DISABLE;
+			o_mem_wen <= 4'b0000;  //may be it represent read, i am not sure 07/05
+			o_mem_byte_se <= `MEM_SE_BYTE;
 			case(opcode)
 				//o_reg1_read <= `REG_READ;
 				//o_reg2_read <= `REG_READ;
@@ -291,61 +290,67 @@ module Decoder(
 				//o_jump <= `NO_JUMP;
 				//o_jump_src <= `JUMP_FROM_REG;
 				//o_branch <= `NO_BRANCH;
-				//o_mem_write <= `MEM_NO_WRITE;
-				//o_mem_read <= `MEM_NO_READ;
 				//o_result_or_mem <= `REG3_FROM_RESULT; //it doesn't matter bec reg3 no write
 				//o_reg3_write <= `REG3_WRITE;
 				`LB_OPCODE: begin
 					o_aluop <= `LB_ALU_OPCODE;
-					o_mem_read <= `MEM_READ;
+					o_mem_en <= `MEM_ENABLE;
 					o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
 				end	
 				`LBU_OPCODE: begin
 					o_aluop <= `LBU_ALU_OPCODE;
-					o_mem_read <= `MEM_READ;
-					o_mem_byte_se <= `MEM_SE_BYTE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_byte_se <= `MEM_SE_BYTE_U;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
 				end	
 				`LH_OPCODE: begin
 					o_aluop <= `LH_ALU_OPCODE;
-					o_mem_read <= `MEM_READ;
+					o_mem_en <= `MEM_ENABLE;
 					o_mem_byte_se <= `MEM_SE_HALF;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
 				end	
 				`LHU_OPCODE: begin
 					o_aluop <= `LHU_ALU_OPCODE;
-					o_mem_read <= `MEM_READ;
-					o_mem_byte_se <= `MEM_SE_HALF;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_byte_se <= `MEM_SE_HALF_U;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
 				end	
 				`LW_OPCODE: begin
 					o_aluop <= `LW_ALU_OPCODE;
-					o_mem_read <= `MEM_READ;
+					o_mem_en <= `MEM_ENABLE;
 					o_mem_byte_se <= `MEM_SE_WORD;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
 				end	
 				`SB_OPCODE: begin
 					o_aluop <= `SB_ALU_OPCODE;
-					o_mem_write <= `MEM_WRITE;
-					o_mem_byte_se <= `MEM_SE_BYTE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_wen <= 4'b0001;
+					//o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				`SH_OPCODE: begin
 					o_aluop <= `SH_ALU_OPCODE;
-					o_mem_write <= `MEM_WRITE;
-					o_mem_byte_se <= `MEM_SE_BYTE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_wen <= 4'b0011;
+					//o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				`SW_OPCODE: begin
 					o_aluop <= `SW_ALU_OPCODE;
-					o_mem_write <= `MEM_WRITE;
-					o_mem_byte_se <= `MEM_SE_BYTE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_wen <= 4'b1111;
+					//o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg3_write <= `REG3_NO_WRITE;
 				end	
 				default: begin

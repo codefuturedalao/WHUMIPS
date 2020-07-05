@@ -25,8 +25,8 @@ module DMEM(
 	input wire i_clk,
 	input wire [`REG_WIDTH] i_addr,
 	input wire [`REG_WIDTH] i_data,
-	input wire i_mem_read,
-	input wire i_mem_write,
+	input wire i_mem_en,
+	input wire i_mem_wen,
 
 	output reg [`REG_WIDTH] o_data
     );
@@ -34,7 +34,7 @@ module DMEM(
 	//read
 	always
 		@(*) begin
-				if(i_mem_read == `MEM_READ) begin
+				if(i_mem_en == `MEM_ENABLE && i_mem_wen == 4'b0000) begin
 					o_data <= dmem[i_addr];
 				end
 				else begin
@@ -43,8 +43,19 @@ module DMEM(
 		end
 	always
 			@(posedge i_clk) begin
-				if(i_mem_write == `MEM_WRITE) begin
-					dmem[i_addr] <= i_data;
+				if(i_mem_en == `MEM_ENABLE) begin
+					if(i_mem_wen[0] == 1'b1) begin
+							dmem[i_addr][7:0] <= i_data[7:0];
+					end
+					if(i_mem_wen[1] == 1'b1) begin
+							dmem[i_addr][15:7] <= i_data[15:8];
+					end
+					if(i_mem_wen[2] == 1'b1) begin
+							dmem[i_addr][23:16] <= i_data[15:8];
+					end
+					if(i_mem_wen[3] == 1'b1) begin
+							dmem[i_addr][31:24] <= i_data[15:8];
+					end
 				end	
 			end
 endmodule

@@ -27,7 +27,7 @@ module Ctrl(
 	input wire i_ex_reg2_read,
 	input wire [`REG_ADDR_WIDTH] i_mem_reg3_addr,
 	input wire i_mem_reg3_write,
-	input wire i_mem_mem_read,
+	input wire i_mem_result_or_mem,  //represent load instruction
 	input wire [`REG_ADDR_WIDTH] i_wb_reg3_addr,
 	input wire [`REG_ADDR_WIDTH] i_wb_reg3_addr,
 	input wire i_wb_reg3_write,
@@ -71,7 +71,7 @@ module Ctrl(
 	always
 		@(*) begin
 				o_stall <= 6'b000000;
-				if(i_mem_mem_read == `MEM_READ) begin//load inst
+				if(i_mem_result_or_mem == `REG3_FROM_MEM) begin//load inst
 						if(i_ex_reg1_addr == i_mem_reg3_addr && i_ex_reg1_read == `REG_READ || i_ex_reg2_addr == i_mem_reg3_addr && i_ex_reg1_read == `REG_READ) begin
 							o_stall <= 6'b111100;
 						end
