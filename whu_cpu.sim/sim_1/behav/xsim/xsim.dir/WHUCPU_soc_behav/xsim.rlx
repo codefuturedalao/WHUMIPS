@@ -1,0 +1,12 @@
+
+{ 
+    crc :  7830463170066244567  , 
+    ccp_crc :  0  , 
+    cmdline : " -wto fd470f3287c9458d94242a82ee99f1ad --incr --debug typical --relax --mt 8 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip --snapshot WHUCPU_soc_behav xil_defaultlib.WHUCPU_soc xil_defaultlib.glbl" , 
+    buildDate : "Nov  6 2019" , 
+    buildTime : "21:42:20" , 
+    linkCmd : "/usr/bin/gcc -Wa,-W  -O -fPIC  -m64  -Wl,--no-as-needed  -Wl,--unresolved-symbols=ignore-all  -o \"xsim.dir/WHUCPU_soc_behav/xsimk\"   \"xsim.dir/WHUCPU_soc_behav/obj/xsim_0.lnx64.o\" \"xsim.dir/WHUCPU_soc_behav/obj/xsim_1.lnx64.o\" -L\"/home/jacksonsang/xilinx/Vivado/2019.2/lib/lnx64.o\" -lrdi_simulator_kernel   -lrdi_simbridge_kernel" , 
+    aggregate_nets : 
+    [ 
+    ] 
+} 

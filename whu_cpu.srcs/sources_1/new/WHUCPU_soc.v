@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "define.v"
+`include "defines.v"
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -39,7 +39,7 @@ module WHUCPU_soc(
 			.o_imem_addr(imem_addr), .o_dmem_addr(dmem_addr), .o_dmem_data(dmem_idata), .o_dmem_wen(dmem_wen), .o_dmem_en(dmem_en)
 	);
 	IMEM my_imem(
-			.i_pc(imem_addr), .o_inst(imem_data)
+			.i_en(~i_sys_rst),.i_pc(imem_addr), .o_inst(imem_data)
 	);
 
 	DMEM my_dmem(

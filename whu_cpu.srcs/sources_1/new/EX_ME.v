@@ -72,8 +72,8 @@ module EX_ME(
 						o_mem_alu_result <= i_ex_alu_result;
 						o_mem_reg2_ndata <= i_ex_reg2_ndata;
 						o_mem_reg3_addr <= i_ex_reg3_addr;
-						o_mem_mem_wen <= i_ex_mem_write;
-						o_mem_mem_en <= i_ex_mem_read;
+						o_mem_mem_wen <= i_ex_mem_wen;
+						o_mem_mem_en <= i_ex_mem_en;
 						o_mem_mem_byte_se <= i_ex_mem_byte_se;
 						o_mem_result_or_mem <= i_ex_result_or_mem;
 						o_mem_reg3_write <= i_ex_reg3_write;

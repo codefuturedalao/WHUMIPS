@@ -33,7 +33,7 @@ module WHUCPU(
 	output wire o_dmem_en
     );
 	wire [`STALL_WIDTH] stall;
-	wire branch_pc;
+	wire [`INST_ADDR_WIDTH] branch_pc;
 	wire is_branch;
 	wire flush;
 	wire [`INST_ADDR_WIDTH] if_pc;
@@ -71,7 +71,7 @@ module WHUCPU(
 	Decoder my_decoder(
 			.i_inst(id_inst), 
 
-			.o_reg1_read(id_reg1_rad), .o_reg2_read(id_reg2_read), .o_reg1_addr(id_reg1_addr), .o_reg2_addr(id_reg2_addr), 
+			.o_reg1_read(id_reg1_read), .o_reg2_read(id_reg2_read), .o_reg1_addr(id_reg1_addr), .o_reg2_addr(id_reg2_addr), 
 			.o_reg3_addr(id_reg3_addr), .o_aluop(id_aluop), .o_imm26(id_imm26), .o_jump(id_jump), 
 			.o_jump_src(id_jump_src), .o_branch(id_branch), .o_mem_en(id_mem_en), .o_mem_wen(id_mem_wen), 
 			.o_mem_byte_se(id_mem_byte_se), .o_result_or_mem(id_result_or_mem), .o_reg3_write(id_reg3_write)
@@ -110,11 +110,11 @@ module WHUCPU(
 	wire [`INST_ADDR_WIDTH] ex_pc;
 	ID_EX my_id_ex(
 			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_flush(flush),
-			.i_id_reg1_addr(id_reg1_addr), .i_id_reg2_addr(i_id_reg2_addr),
+			.i_id_reg1_addr(id_reg1_addr), .i_id_reg2_addr(id_reg2_addr),
 			.i_id_reg1_read(id_reg1_read), .i_id_reg2_read(id_reg2_read),
-			.i_id_reg1_data(id_reg1_data), .i_reg2_data(id_reg2_data),
+			.i_id_reg1_data(id_reg1_data), .i_id_reg2_data(id_reg2_data),
 			.i_id_reg3_addr(id_reg3_addr), .i_id_imm26(id_imm26),.i_id_aluop(id_aluop),
-			.i_id_jump(id_jump), .i_id_jump_src(id_jump_src), .i_id_branch(id_branch),
+			.i_id_jump(id_jump), .i_id_jump_src(id_jump_src), .i_id_result_or_mem(id_result_or_mem),
 			.i_id_branch(id_branch), .i_id_mem_wen(id_mem_wen), .i_id_mem_en(id_mem_en),
 			.i_id_mem_byte_se(id_mem_byte_se), .i_id_reg3_write(id_reg3_write), .i_id_pc(id_pc),
 
@@ -143,7 +143,7 @@ module WHUCPU(
 	wire exception_flag;
 	wire [`REG_WIDTH] ex_alu_result;
 	ALU my_alu(
-			.i_pc(ex_pc), .i_reg1_ndata(ex_reg1_ndata), .i_reg2_ndata(ex_reg2_ndata), .i_imm16(ex_imm16),
+			.i_pc(ex_pc), .i_reg1_ndata(ex_reg1_ndata), .i_reg2_ndata(ex_reg2_ndata), .i_imm16(ex_imm26[15:0]),
 			.i_aluop(ex_aluop),
 
 			.o_branch_flag(branch_flag), .o_exception_flag(exception_flag), .o_alu_result(ex_alu_result)
@@ -168,7 +168,7 @@ module WHUCPU(
 	);	
 	
 	wire [`REG_WIDTH] o_mem_reg2_ndata;
-	wire [2:0] mem_byte_se;
+	wire [2:0] mem_mem_byte_se;
 	assign o_dmem_addr = mem_alu_result;
 	EX_ME my_ex_me(
 			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_ex_alu_result(ex_alu_result), .i_ex_reg2_ndata(ex_reg2_ndata),
@@ -176,7 +176,7 @@ module WHUCPU(
 			.i_ex_result_or_mem(ex_result_or_mem), .i_ex_reg3_write(ex_reg3_write),
 
 			.o_mem_alu_result(mem_alu_result), .o_mem_reg2_ndata(o_dmem_data), .o_mem_reg3_addr(mem_reg3_addr), .o_mem_mem_wen(o_dmem_wen),
-			.o_mem_mem_en(o_dmem_en), .o_mem_mem_byte_se(mem_byte_se), .o_mem_result_or_mem(mem_result_or_mem), .o_mem_reg3_write(mem_reg3_write)
+			.o_mem_mem_en(o_dmem_en), .o_mem_mem_byte_se(mem_mem_byte_se), .o_mem_result_or_mem(mem_result_or_mem), .o_mem_reg3_write(mem_reg3_write)
 	);
 	
 	wire [2:0] wb_mem_byte_se;

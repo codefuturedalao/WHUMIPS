@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "defines.v"
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -33,7 +34,7 @@ module Ctrl(
 	input wire i_jump_branch,
 	
 	output reg [`STALL_WIDTH] o_stall,
-	output reg o_flush,
+	output wire o_flush,
 	output reg [1:0] o_forwardA,
 	output reg [1:0] o_forwardB
     );

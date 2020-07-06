@@ -35,7 +35,7 @@
 `define REG3_NO_WRITE 1'b0
 
 //
-`define ZERO_WORD 32'b0000_0000_0000_0000_0000_0000_0000_0000;
+`define ZERO_WORD 32'b0000_0000_0000_0000_0000_0000_0000_0000
 
 /*    --------------- ID stage ----------------    */
 /*opcode defines*/

@@ -26,7 +26,7 @@ module DMEM(
 	input wire [`REG_WIDTH] i_addr,
 	input wire [`REG_WIDTH] i_data,
 	input wire i_mem_en,
-	input wire i_mem_wen,
+	input wire [3:0] i_mem_wen,
 
 	output reg [`REG_WIDTH] o_data
     );
@@ -38,7 +38,7 @@ module DMEM(
 					o_data <= dmem[i_addr];
 				end
 				else begin
-					o_dat <= `ZERO_WORD;
+					o_data <= `ZERO_WORD;
 				end
 		end
 	always
