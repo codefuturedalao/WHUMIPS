@@ -43,7 +43,7 @@ module WHUCPU(
 
 			.o_pc(if_pc)
 	);
-
+    assign o_imem_addr = if_pc;
 	wire [`INST_ADDR_WIDTH] id_pc;
 	wire [`INST_WIDTH] id_inst;
 	IF_ID my_if_id(

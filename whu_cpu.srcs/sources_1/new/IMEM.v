@@ -29,7 +29,7 @@ module IMEM(
 
 	reg [31:0] imem [127:0];
 
-	initial $readmemh("/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/inst_rom.data", imem);
+	initial $readmemh("/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/data/inst_rom.data", imem);
 
 	always
 		@(*) begin

@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "defines.v"
+`include "../../sources_1/new/defines.v"
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -39,7 +39,7 @@ module WHUCPU_soc_tb(
 			#1000 $stop;
 	end
 
-	WHU_CPU_soc my_whu_cpu_soc(
+	WHUCPU_soc my_whu_cpu_soc(
 			.i_sys_clk(CLOCK_50),
 			.i_sys_rst(rst)
 	);

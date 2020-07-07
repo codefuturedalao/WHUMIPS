@@ -1,7 +1,7 @@
-Running: xsim.dir/WHUCPU_soc_behav/xsimk -simmode gui -wdb WHUCPU_soc_behav.wdb -simrunnum 0 -socket 50169
+Running: xsim.dir/WHUCPU_soc_behav/xsimk -simmode gui -wdb WHUCPU_soc_behav.wdb -simrunnum 0 -socket 49895
 Design successfully loaded
 Design Loading Memory Usage: 33564 KB (Peak: 33620 KB)
 Design Loading CPU Usage: 10 ms
 Simulation completed
-Simulation Memory Usage: 119660 KB (Peak: 172832 KB)
-Simulation CPU Usage: 10 ms
+Simulation Memory Usage: 115300 KB (Peak: 172832 KB)
+Simulation CPU Usage: 20 ms

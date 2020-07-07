@@ -39,7 +39,7 @@ module RG(
 	always
 		@(posedge i_clk) begin
 			/* don't use i_rst to control write data */
-			if(i_reg3_write == `REG3_WRITE) begin
+			if(i_reg3_write == `REG3_WRITE && i_reg3_addr != 5'b00000) begin
 				rg[i_reg3_addr] <= i_reg3_data;
 			end
 		end
@@ -56,9 +56,12 @@ module RG(
 					if(i_reg3_addr == i_reg1_addr && i_reg3_write == `REG3_WRITE && i_reg3_addr != 5'b00000) begin //solve data hazard
 						o_reg1_data <= i_reg3_data;	
 					end
+					else if (i_reg1_addr == 5'b0) begin
+						o_reg1_data <= `ZERO_WORD; //normal read	
+					end 
 					else begin
 						o_reg1_data <= rg[i_reg1_addr]; //normal read	
-					end 
+					end
 				end
 				else begin
 					o_reg1_data <= `ZERO_WORD;
@@ -67,6 +70,9 @@ module RG(
 				if(i_reg2_read == `REG_READ) begin
 					if(i_reg3_addr == i_reg2_addr && i_reg3_write == `REG3_WRITE && i_reg3_addr != 5'b00000) begin //solve data hazard
 						o_reg2_data <= i_reg3_data;	
+					end
+					else if(i_reg2_addr == 5'b0) begin
+							o_reg2_data <= `ZERO_WORD;
 					end
 					else begin
 						o_reg2_data <= rg[i_reg2_addr];	//normal read	

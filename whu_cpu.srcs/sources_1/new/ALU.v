@@ -46,7 +46,7 @@ module ALU(
 	assign sub_result_imm = {i_reg1_ndata[31],i_reg1_ndata[31:0]} - imm32_unsign; //use for slti
 
 	always
-		@(i_aluop) begin
+		@(*) begin
 			o_exception_flag <= `NO_EXCEPTION;
 			case(i_aluop)
 				`ADD_ALU_OPCODE: begin
@@ -148,27 +148,32 @@ module ALU(
 
 /*branch and jump */
 	always
-		@(i_aluop) begin
+		@(*) begin
 			o_branch_flag <= 1'b0;
-			o_alu_result <= `ZERO_WORD;
 			case(i_aluop)
 				`BEQ_ALU_OPCODE: begin
 					o_branch_flag <= ~(| sub_result_reg[31:0]);
+					o_alu_result <= `ZERO_WORD;
 				end	
 				`BNE_ALU_OPCODE: begin
 					o_branch_flag <= | sub_result_reg[31:0];
+					o_alu_result <= `ZERO_WORD;
 				end	
 				`BGEZ_ALU_OPCODE: begin
 					o_branch_flag <= ~(i_reg1_ndata[31]);
+					o_alu_result <= `ZERO_WORD;
 				end	
 				`BGTZ_ALU_OPCODE: begin
 					o_branch_flag <= (~i_reg1_ndata[31] & i_reg1_ndata != 32'b0);
+					o_alu_result <= `ZERO_WORD;
 				end	
 				`BLEZ_ALU_OPCODE: begin
 					o_branch_flag <= (~i_reg1_ndata[31] | i_reg1_ndata == 32'b0);
+					o_alu_result <= `ZERO_WORD;
 				end	
 				`BLTZ_ALU_OPCODE: begin
 					o_branch_flag <= i_reg1_ndata[31];
+					o_alu_result <= `ZERO_WORD;
 				end	
 				`BGEZAL_ALU_OPCODE: begin
 					o_branch_flag <= ~(i_reg1_ndata[31]);
@@ -180,12 +185,14 @@ module ALU(
 				end	
 				`J_ALU_OPCODE: begin
 					//nothing
+					o_alu_result <= `ZERO_WORD;
 				end
 				`JAL_ALU_OPCODE: begin
 					o_alu_result <= i_pc + 8;	
 				end
 				`JR_ALU_OPCODE: begin
 					//nothing
+					o_alu_result <= `ZERO_WORD;
 				end
 				`JALR_ALU_OPCODE: begin
 					o_alu_result <= i_pc + 8;	
@@ -194,7 +201,7 @@ module ALU(
 		end
 /* access memory */
 	always
-		@(i_aluop) begin
+		@(*) begin
 			case(i_aluop)
 				//lb and lbu is the same as addiu
 				`LH_ALU_OPCODE: begin

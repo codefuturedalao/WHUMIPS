@@ -1,2 +1,3 @@
 Vivado Simulator 2019.2
 Time resolution is 1 ps
+$stop called at time : 1195 ns : File "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sim_1/new/WHUCPU_soc_tb.v" Line 39
