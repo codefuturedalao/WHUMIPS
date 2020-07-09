@@ -48,7 +48,7 @@ module Decoder(
 
 /*arth and logical*/
 	always
-		@(opcode) begin
+		@(*) begin
             o_reg1_read <= `REG_READ;
             o_reg2_read <= `REG_READ;
             o_reg3_addr <= i_inst[15:11];
@@ -80,7 +80,7 @@ module Decoder(
 					o_reg3_addr <= i_inst[20:16];
 				end
 				`ANDI_OPCODE: begin
-					o_aluop <= `ADDI_ALU_OPCODE;
+					o_aluop <= `ANDI_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
 				end
@@ -178,7 +178,7 @@ module Decoder(
 
 /*branch and jump*/
 	always
-		@(opcode) begin
+		@(*) begin
 			case(opcode)
 				//o_reg1_read <= `REG_READ;
 				//o_reg2_read <= `REG_READ;
@@ -278,7 +278,7 @@ module Decoder(
 
 /*load and store*/
 	always
-		@(opcode) begin
+		@(*) begin
 			o_mem_en <= `MEM_DISABLE;
 			o_mem_wen <= 4'b0000;  //may be it represent read, i am not sure 07/05
 			o_mem_byte_se <= `MEM_SE_BYTE;

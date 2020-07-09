@@ -12,14 +12,14 @@ Compiling module xil_defaultlib.PC
 Compiling module xil_defaultlib.IF_ID
 Compiling module xil_defaultlib.Decoder
 Compiling module xil_defaultlib.RG
-Compiling module xil_defaultlib.ID_EX
 Compiling module xil_defaultlib.MUX1
-Compiling module xil_defaultlib.ALU
 Compiling module xil_defaultlib.BranchControl
 Compiling module xil_defaultlib.Ctrl
+Compiling module xil_defaultlib.ID_EX
+Compiling module xil_defaultlib.ALU
 Compiling module xil_defaultlib.EX_ME
-Compiling module xil_defaultlib.ME_WB
 Compiling module xil_defaultlib.MUX2
+Compiling module xil_defaultlib.ME_WB
 Compiling module xil_defaultlib.WHUCPU
 Compiling module xil_defaultlib.IMEM
 Compiling module xil_defaultlib.DMEM

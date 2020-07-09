@@ -27,24 +27,73 @@ module BranchControl(
 	input wire i_branch,
 	input wire [`INST_ADDR_WIDTH] i_pc,
 	input wire [25:0] i_imm26,
-	input wire [`REG_WIDTH] i_jump_reg_data,
-	input wire i_branch_flag,
+	input wire [`REG_WIDTH] i_reg1_ndata,
+	input wire [`REG_WIDTH] i_reg2_ndata,
+	input wire [`ALUOP_WIDTH] i_aluop, 
 	output wire o_jump_branch,
 	output reg [`INST_ADDR_WIDTH] o_jump_branch_pc
     );
-	assign o_jump_branch = i_jump & i_branch & i_branch_flag;	
+	reg branch_flag;
+	assign o_jump_branch = (branch_flag & i_branch) | i_jump;
 	always
-		@(i_jump, i_jump_src, i_branch, i_pc, i_imm26, i_jump_reg_data) begin
+		@(i_jump, i_jump_src, i_branch, i_pc, i_imm26, i_reg1_ndata, i_reg2_ndata, i_aluop, branch_flag) begin
 			if(i_jump == `IS_JUMP) begin
 				if(i_jump_src == `JUMP_FROM_REG) begin
-					o_jump_branch_pc <= i_jump_reg_data;
+					o_jump_branch_pc <= i_reg1_ndata;
 				end	
 				else begin
 					o_jump_branch_pc <= {i_pc[31:28], i_imm26, 2'b00};
 				end
 			end 
-			else begin 
+			else if(i_branch == `IS_BRANCH && branch_flag == 1'b1) begin 
 				o_jump_branch_pc <= i_pc + {{14{i_imm26[15]}}, i_imm26, 2'b00};
 			end
+			else begin
+				o_jump_branch_pc <= `ZERO_WORD;
+			end
+		end
+
+	always
+		@(*) begin
+			branch_flag <= 1'b0;
+			case(i_aluop)
+				`BEQ_ALU_OPCODE: begin
+					if(i_reg1_ndata == i_reg2_ndata) begin
+							branch_flag <= 1'b1;
+					end
+					else begin
+							branch_flag <= 1'b0;
+					end
+				end	
+				`BNE_ALU_OPCODE: begin
+					if(i_reg1_ndata != i_reg2_ndata) begin
+							branch_flag <= 1'b1;
+					end
+					else begin
+							branch_flag <= 1'b0;
+					end
+				end	
+				`BGEZ_ALU_OPCODE: begin
+					branch_flag <= ~(i_reg1_ndata[31]);
+				end	
+				`BGTZ_ALU_OPCODE: begin
+					branch_flag <= (~i_reg1_ndata[31] & i_reg1_ndata != 32'b0);
+				end	
+				`BLEZ_ALU_OPCODE: begin
+					branch_flag <= (~i_reg1_ndata[31] | i_reg1_ndata == 32'b0);
+				end	
+				`BLTZ_ALU_OPCODE: begin
+					branch_flag <= i_reg1_ndata[31];
+				end	
+				`BGEZAL_ALU_OPCODE: begin
+					branch_flag <= ~(i_reg1_ndata[31]);
+				end	
+				`BLTZAL_ALU_OPCODE: begin
+					branch_flag <= i_reg1_ndata[31];
+				end	
+				default: begin
+						//do nothing
+				end
+			endcase
 		end
 endmodule

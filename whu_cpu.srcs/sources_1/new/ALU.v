@@ -27,7 +27,6 @@ module ALU(
 	input wire [`REG_WIDTH] i_reg2_ndata,
 	input wire [15:0] i_imm16,
 	input wire [`ALUOP_WIDTH] i_aluop,
-	output reg o_branch_flag,
 	output reg o_exception_flag,
 	output reg [`REG_WIDTH] o_alu_result
     );
@@ -123,22 +122,22 @@ module ALU(
 					o_alu_result <= i_reg1_ndata ^ imm32_unsign;
 				end
 				`SLLV_ALU_OPCODE: begin
-					o_alu_result <= i_reg1_ndata << i_reg2_ndata[4:0]; 
+					o_alu_result <= i_reg2_ndata << i_reg1_ndata[4:0]; 
 				end
 				`SLL_ALU_OPCODE: begin
-					o_alu_result <= i_reg1_ndata << i_imm16[10:6]; 
+					o_alu_result <= i_reg2_ndata << i_imm16[10:6]; 
 				end
 				`SRAV_ALU_OPCODE: begin
-					o_alu_result <= (i_reg1_ndata >> i_reg2_ndata[4:0]) | (i_reg1_ndata[31]) ? ~({32{1'b1}} >> i_reg2_ndata[4:0]) : 32'b0; 
+					o_alu_result <= (i_reg2_ndata >> i_reg1_ndata[4:0]) | ((i_reg2_ndata[31]) ? ~({32{1'b1}} >> i_reg1_ndata[4:0]) : 32'b0); 
 				end
 				`SRA_ALU_OPCODE: begin
-					o_alu_result <= (i_reg1_ndata >> i_imm16[10:6]) | (i_reg1_ndata[31]) ? ~({32{1'b1}} >> i_imm16[10:6]) : 32'b0; 
+					o_alu_result <= (i_reg2_ndata >> i_imm16[10:6]) | ((i_reg2_ndata[31]) ? ~({32{1'b1}} >> i_imm16[10:6]) : 32'b0); 
 				end
 				`SRLV_ALU_OPCODE: begin
-					o_alu_result <= i_reg1_ndata >> i_reg2_ndata[4:0]; 
+					o_alu_result <= i_reg2_ndata >> i_reg1_ndata[4:0]; 
 				end
 				`SRL_ALU_OPCODE: begin
-					o_alu_result <= i_reg1_ndata >> i_imm16[10:6]; 
+					o_alu_result <= i_reg2_ndata >> i_imm16[10:6]; 
 				end
 				default: begin
 				    //todo
@@ -149,38 +148,29 @@ module ALU(
 /*branch and jump */
 	always
 		@(*) begin
-			o_branch_flag <= 1'b0;
 			case(i_aluop)
 				`BEQ_ALU_OPCODE: begin
-					o_branch_flag <= ~(| sub_result_reg[31:0]);
 					o_alu_result <= `ZERO_WORD;
 				end	
 				`BNE_ALU_OPCODE: begin
-					o_branch_flag <= | sub_result_reg[31:0];
 					o_alu_result <= `ZERO_WORD;
 				end	
 				`BGEZ_ALU_OPCODE: begin
-					o_branch_flag <= ~(i_reg1_ndata[31]);
 					o_alu_result <= `ZERO_WORD;
 				end	
 				`BGTZ_ALU_OPCODE: begin
-					o_branch_flag <= (~i_reg1_ndata[31] & i_reg1_ndata != 32'b0);
 					o_alu_result <= `ZERO_WORD;
 				end	
 				`BLEZ_ALU_OPCODE: begin
-					o_branch_flag <= (~i_reg1_ndata[31] | i_reg1_ndata == 32'b0);
 					o_alu_result <= `ZERO_WORD;
 				end	
 				`BLTZ_ALU_OPCODE: begin
-					o_branch_flag <= i_reg1_ndata[31];
 					o_alu_result <= `ZERO_WORD;
 				end	
 				`BGEZAL_ALU_OPCODE: begin
-					o_branch_flag <= ~(i_reg1_ndata[31]);
 					o_alu_result <= i_pc + 8;
 				end	
 				`BLTZAL_ALU_OPCODE: begin
-					o_branch_flag <= i_reg1_ndata[31];
 					o_alu_result <= i_pc + 8;
 				end	
 				`J_ALU_OPCODE: begin

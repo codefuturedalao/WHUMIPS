@@ -90,113 +90,100 @@ module WHUCPU(
 			.o_reg1_data(id_reg1_data), .o_reg2_data(id_reg2_data)
 	);
 
-	wire [`REG_ADDR_WIDTH] ex_reg1_addr;
-	wire [`REG_ADDR_WIDTH] ex_reg2_addr;
-	wire ex_reg1_read;
-	wire ex_reg2_read; 
-	wire [`REG_WIDTH] ex_reg1_data;
-	wire [`REG_WIDTH] ex_reg2_data;
-	wire [`REG_ADDR_WIDTH] ex_reg3_addr;
-	wire [25:0] ex_imm26;
-	wire [`ALUOP_WIDTH] ex_aluop;
-	wire ex_jump;
-	wire ex_jump_src;
-	wire ex_branch;
-	wire [3:0] ex_mem_wen;
-	wire ex_mem_en;
-	wire [2:0] ex_mem_byte_se;
-	wire ex_result_or_mem;
-	wire ex_reg3_write;
-	wire [`INST_ADDR_WIDTH] ex_pc;
-	ID_EX my_id_ex(
-			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_flush(flush),
-			.i_id_reg1_addr(id_reg1_addr), .i_id_reg2_addr(id_reg2_addr),
-			.i_id_reg1_read(id_reg1_read), .i_id_reg2_read(id_reg2_read),
-			.i_id_reg1_data(id_reg1_data), .i_id_reg2_data(id_reg2_data),
-			.i_id_reg3_addr(id_reg3_addr), .i_id_imm26(id_imm26),.i_id_aluop(id_aluop),
-			.i_id_jump(id_jump), .i_id_jump_src(id_jump_src), .i_id_result_or_mem(id_result_or_mem),
-			.i_id_branch(id_branch), .i_id_mem_wen(id_mem_wen), .i_id_mem_en(id_mem_en),
-			.i_id_mem_byte_se(id_mem_byte_se), .i_id_reg3_write(id_reg3_write), .i_id_pc(id_pc),
-
-			.o_ex_reg1_addr(ex_reg1_addr), .o_ex_reg2_addr(ex_reg2_addr), .o_ex_reg1_read(ex_reg1_read),
-			.o_ex_reg2_read(ex_reg2_read), .o_ex_reg1_data(ex_reg1_data), .o_ex_reg2_data(ex_reg2_data),
-			.o_ex_reg3_addr(ex_reg3_addr), .o_ex_imm26(ex_imm26), .o_ex_aluop(ex_aluop),
-			.o_ex_jump(ex_jump), .o_ex_jump_src(ex_jump_src), .o_ex_branch(ex_branch), .o_ex_mem_wen(ex_mem_wen),
-			.o_ex_mem_en(ex_mem_en), .o_ex_mem_byte_se(ex_mem_byte_se), .o_ex_result_or_mem(ex_result_or_mem),
-			.o_ex_reg3_write(ex_reg3_write), .o_ex_pc(ex_pc)
-	);	
-
 	wire [1:0] forwardA;
 	wire [1:0] forwardB;
-	wire [`REG_WIDTH] mem_alu_result;
-	wire [`REG_WIDTH] ex_reg1_ndata;
-	wire [`REG_WIDTH] ex_reg2_ndata;
-	MUX1 my_mux1(
-			.i_forwardA(forwardA), .i_forwardB(forwardB), .i_mem_alu_result(mem_alu_result), .i_wb_reg3_data(wb_reg3_data),
-			.i_reg1_data(ex_reg1_data), .i_reg2_data(ex_reg2_data),
-
-			.o_reg1_data(ex_reg1_ndata), .o_reg2_data(ex_reg2_ndata)
-	);
-
-	
-	wire branch_flag;
-	wire exception_flag;
 	wire [`REG_WIDTH] ex_alu_result;
-	ALU my_alu(
-			.i_pc(ex_pc), .i_reg1_ndata(ex_reg1_ndata), .i_reg2_ndata(ex_reg2_ndata), .i_imm16(ex_imm26[15:0]),
-			.i_aluop(ex_aluop),
+	wire [`REG_WIDTH] id_reg1_ndata;
+	wire [`REG_WIDTH] id_reg2_ndata;
+	wire [`REG_WIDTH] mem_reg3_data;
+	MUX1 my_mux1(
+			.i_forwardA(forwardA), .i_forwardB(forwardB), .i_ex_alu_result(ex_alu_result), .i_mem_reg3_data(mem_reg3_data),
+			.i_reg1_data(id_reg1_data), .i_reg2_data(id_reg2_data),
 
-			.o_branch_flag(branch_flag), .o_exception_flag(exception_flag), .o_alu_result(ex_alu_result)
+			.o_reg1_data(id_reg1_ndata), .o_reg2_data(id_reg2_ndata)
 	);
-	
+
 	BranchControl my_branch_control(
-			.i_jump(ex_jump), .i_jump_src(ex_jump_src), .i_branch(ex_branch), .i_pc(ex_pc), .i_imm26(ex_imm26),
-			.i_jump_reg_data(ex_reg1_ndata), .i_branch_flag(branch_flag), 
+			.i_jump(id_jump), .i_jump_src(id_jump_src), .i_branch(id_branch), .i_pc(id_pc), .i_imm26(id_imm26),
+			.i_reg1_ndata(id_reg1_ndata), .i_reg2_ndata(id_reg2_ndata), .i_aluop(id_aluop), 
 
 			.o_jump_branch(is_branch), .o_jump_branch_pc(branch_pc)
 	);	
 
+	wire [`REG_ADDR_WIDTH] ex_reg3_addr;
+	wire ex_reg3_write;
+	wire ex_result_or_mem;
 	wire [`REG_ADDR_WIDTH] mem_reg3_addr;
 	wire mem_reg3_write;
-	wire mem_result_or_mem;
 	Ctrl my_ctrl(
-			.i_ex_reg1_addr(ex_reg1_addr), .i_ex_reg2_addr(ex_reg2_addr), .i_ex_reg1_read(ex_reg1_read), .i_ex_reg2_read(ex_reg2_read),
-			.i_mem_reg3_addr(mem_reg3_addr), .i_mem_reg3_write(mem_reg3_write), .i_mem_result_or_mem(mem_result_or_mem), 
-			.i_wb_reg3_addr(wb_reg3_addr), .i_wb_reg3_write(wb_reg3_write), .i_jump_branch(is_branch),
+			.i_id_reg1_addr(id_reg1_addr), .i_id_reg2_addr(id_reg2_addr), .i_id_reg1_read(id_reg1_read), .i_id_reg2_read(id_reg2_read),
+			.i_ex_reg3_addr(ex_reg3_addr), .i_ex_reg3_write(ex_reg3_write), .i_ex_result_or_mem(ex_result_or_mem), 
+			.i_mem_reg3_addr(mem_reg3_addr), .i_mem_reg3_write(mem_reg3_write), 
 
 			.o_stall(stall), .o_flush(flush), .o_forwardA(forwardA), .o_forwardB(forwardB)
 	);	
 	
-	wire [`REG_WIDTH] o_mem_reg2_ndata;
+
+	wire [`REG_WIDTH] ex_reg1_data;
+	wire [`REG_WIDTH] ex_reg2_data;
+	wire [15:0] ex_imm16;
+	wire [`ALUOP_WIDTH] ex_aluop;
+	wire [3:0] ex_mem_wen;
+	wire ex_mem_en;
+	wire [2:0] ex_mem_byte_se;
+	wire [`INST_ADDR_WIDTH] ex_pc;
+	ID_EX my_id_ex(
+			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_flush(flush),
+
+
+			.i_id_reg1_data(id_reg1_ndata), .i_id_reg2_data(id_reg2_ndata),
+			.i_id_reg3_addr(id_reg3_addr), .i_id_imm16(id_imm26[15:0]),.i_id_aluop(id_aluop),
+			.i_id_result_or_mem(id_result_or_mem),
+			.i_id_mem_wen(id_mem_wen), .i_id_mem_en(id_mem_en),
+			.i_id_mem_byte_se(id_mem_byte_se), .i_id_reg3_write(id_reg3_write), .i_id_pc(id_pc),
+
+
+			.o_ex_reg1_data(ex_reg1_data), .o_ex_reg2_data(ex_reg2_data),
+			.o_ex_reg3_addr(ex_reg3_addr), .o_ex_imm16(ex_imm16), .o_ex_aluop(ex_aluop),
+			.o_ex_mem_wen(ex_mem_wen),
+			.o_ex_mem_en(ex_mem_en), .o_ex_mem_byte_se(ex_mem_byte_se), .o_ex_result_or_mem(ex_result_or_mem),
+			.o_ex_reg3_write(ex_reg3_write), .o_ex_pc(ex_pc)
+	);	
+
+
+	
+	wire exception_flag;
+	ALU my_alu(
+			.i_pc(ex_pc), .i_reg1_ndata(ex_reg1_data), .i_reg2_ndata(ex_reg2_data), .i_imm16(ex_imm16),
+			.i_aluop(ex_aluop),
+
+			.o_exception_flag(exception_flag), .o_alu_result(ex_alu_result)
+	);
+
 	wire [2:0] mem_mem_byte_se;
+	wire [`REG_WIDTH] mem_alu_result;
+	wire mem_result_or_mem;
 	assign o_dmem_addr = mem_alu_result;
 	EX_ME my_ex_me(
-			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_ex_alu_result(ex_alu_result), .i_ex_reg2_ndata(ex_reg2_ndata),
+			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_ex_alu_result(ex_alu_result), .i_ex_reg2_ndata(ex_reg2_data),
 			.i_ex_reg3_addr(ex_reg3_addr), .i_ex_mem_wen(ex_mem_wen), .i_ex_mem_en(ex_mem_en), .i_ex_mem_byte_se(ex_mem_byte_se),
 			.i_ex_result_or_mem(ex_result_or_mem), .i_ex_reg3_write(ex_reg3_write),
 
 			.o_mem_alu_result(mem_alu_result), .o_mem_reg2_ndata(o_dmem_data), .o_mem_reg3_addr(mem_reg3_addr), .o_mem_mem_wen(o_dmem_wen),
 			.o_mem_mem_en(o_dmem_en), .o_mem_mem_byte_se(mem_mem_byte_se), .o_mem_result_or_mem(mem_result_or_mem), .o_mem_reg3_write(mem_reg3_write)
 	);
-	
-	wire [2:0] wb_mem_byte_se;
-	wire [`REG_WIDTH] wb_alu_result;
-	wire [`REG_WIDTH] wb_mem_data;
-	//wire [`REG_ADDR_WIDTH] wb_reg3_addr;
-	wire wb_result_or_mem;
-	//wire o_wb_reg3_write
-	ME_WB my_me_wb(
-			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_mem_alu_result(mem_alu_result), .i_mem_mem_data(i_dmem_data), .i_mem_reg3_addr(mem_reg3_addr),
-			.i_mem_result_or_mem(mem_result_or_mem), .i_mem_reg3_write(mem_reg3_write), .i_mem_mem_byte_se(mem_mem_byte_se), 
-
-			.o_wb_mem_byte_se(wb_mem_byte_se), .o_wb_alu_result(wb_alu_result), .o_wb_mem_data(wb_mem_data), .o_wb_reg3_addr(wb_reg3_addr), .o_wb_result_or_mem(wb_result_or_mem),
-			.o_wb_reg3_write(wb_reg3_write)
-	);
 
 	MUX2 my_mux2(
-			.i_result_or_mem(wb_result_or_mem), .i_alu_result(wb_alu_result), .i_mem_data(wb_mem_data), .i_mem_byte_se(wb_mem_byte_se), 
+			.i_result_or_mem(mem_result_or_mem), .i_alu_result(mem_alu_result), .i_mem_data(i_dmem_data), .i_mem_byte_se(mem_mem_byte_se), 
 
-			.o_reg3_data(wb_reg3_data)
+			.o_reg3_data(mem_reg3_data)
+	);
+	
+	ME_WB my_me_wb(
+			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_mem_reg3_data(mem_reg3_data), .i_mem_reg3_addr(mem_reg3_addr),
+			.i_mem_reg3_write(mem_reg3_write), 
+
+			.o_wb_reg3_data(wb_reg3_data), .o_wb_reg3_addr(wb_reg3_addr), .o_wb_reg3_write(wb_reg3_write)
 	);
 
 endmodule
