@@ -34,10 +34,10 @@ module PC(
 			if(i_rst == `RST_ENABLE) begin
 					o_pc <= `DEFAULT_PC;
 			end
-			else if(i_stall[0] == 1'b1 && i_stall[1] == 1'b0) begin
+			else if(i_stall[5] == 1'b1 && i_stall[4] == 1'b0) begin
 					o_pc <= `DEFAULT_PC;
 			end
-			else if(i_stall[1] == 1'b1 && i_stall[1] == 1'b1) begin
+			else if(i_stall[4] == 1'b1 && i_stall[4] == 1'b1) begin
 					//do nothing, just keep the original value
 			end
 			else if(i_isbranch == 1'b1) begin

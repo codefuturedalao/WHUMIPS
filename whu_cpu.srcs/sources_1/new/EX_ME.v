@@ -55,7 +55,7 @@ module EX_ME(
 						o_mem_result_or_mem <= `REG3_FROM_MEM; 
 						o_mem_reg3_write <= `REG3_NO_WRITE;
 				end
-				else if(i_stall[3] == 1'b1 && i_stall[4] == 0) begin
+				else if(i_stall[2] == 1'b1 && i_stall[1] == 0) begin
 						o_mem_alu_result <= `ZERO_WORD;
 						o_mem_reg2_ndata <= `ZERO_WORD;
 						o_mem_reg3_addr <= 5'b00000;
@@ -65,7 +65,7 @@ module EX_ME(
 						o_mem_result_or_mem <= `REG3_FROM_MEM; 
 						o_mem_reg3_write <= `REG3_NO_WRITE;
 				end
-				else if(i_stall[3] == 1'b1 && i_stall[4] == 1) begin
+				else if(i_stall[2] == 1'b1 && i_stall[1] == 1) begin
 						//do nothing, just keep the original value
 				end
 				else begin

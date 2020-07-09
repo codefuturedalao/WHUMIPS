@@ -43,10 +43,10 @@ module Ctrl(
 	//forward 
 	always
 		@(*) begin
-				if(i_ex_reg3_addr == i_id_reg1_addr && i_ex_reg3_write == `REG3_WRITE && i_id_reg1_read == `REG_READ) begin
+				if(i_ex_reg3_addr == i_id_reg1_addr && i_ex_reg3_addr != 5'b00000 && i_ex_reg3_write == `REG3_WRITE && i_id_reg1_read == `REG_READ) begin
 					o_forwardA <= 2'b01;	
 				end	
-				else if(i_mem_reg3_addr == i_id_reg1_addr && i_mem_reg3_write == `REG3_WRITE && i_id_reg1_read == `REG_READ) begin
+				else if(i_mem_reg3_addr == i_id_reg1_addr && i_mem_reg3_addr != 5'b00000 && i_mem_reg3_write == `REG3_WRITE && i_id_reg1_read == `REG_READ) begin
 					o_forwardA <= 2'b10;
 				end
 				else begin
@@ -56,10 +56,10 @@ module Ctrl(
 
 	always
 		@(*) begin
-				if(i_ex_reg3_addr == i_id_reg2_addr && i_ex_reg3_write == `REG3_WRITE && i_id_reg2_read == `REG_READ) begin
+				if(i_ex_reg3_addr == i_id_reg2_addr && i_ex_reg3_addr != 5'b00000 && i_ex_reg3_write == `REG3_WRITE && i_id_reg2_read == `REG_READ) begin
 					o_forwardB <= 2'b01;	
 				end	
-				else if(i_mem_reg3_addr == i_id_reg2_addr && i_mem_reg3_write == `REG3_WRITE && i_id_reg2_read == `REG_READ) begin
+				else if(i_mem_reg3_addr == i_id_reg2_addr && i_mem_reg3_addr != 5'b00000 && i_mem_reg3_write == `REG3_WRITE && i_id_reg2_read == `REG_READ) begin
 					o_forwardB <= 2'b10;
 				end
 				else begin
@@ -71,7 +71,7 @@ module Ctrl(
 		@(*) begin
 				o_stall <= 6'b000000;
 				if(i_ex_result_or_mem == `REG3_FROM_MEM && i_ex_reg3_write == `REG3_WRITE) begin//load inst
-						if(i_id_reg1_addr == i_ex_reg3_addr && i_id_reg1_read == `REG_READ || i_id_reg2_addr == i_ex_reg3_addr && i_id_reg1_read == `REG_READ) begin
+						if(i_id_reg1_addr == i_ex_reg3_addr && i_id_reg1_read == `REG_READ || i_id_reg2_addr == i_ex_reg3_addr && i_id_reg2_read == `REG_READ) begin
 							o_stall <= 6'b111000;
 						end
 				end

@@ -38,11 +38,11 @@ module IF_ID(
 					o_id_inst <= `ZERO_WORD;	
 					o_id_pc <= `ZERO_WORD;
 			end
-			else if(i_flush == `IS_FLUSH || (i_stall[1] == 1'b1 && i_stall[2] == 1'b0)) begin
+			else if(i_flush == `IS_FLUSH || (i_stall[4] == 1'b1 && i_stall[3] == 1'b0)) begin
 					o_id_inst <= `ZERO_WORD;
 					o_id_pc <= `ZERO_WORD;
 			end
-			else if(i_stall[1] == 1'b1 && i_stall[2] == 1'b0) begin
+			else if(i_stall[4] == 1'b1 && i_stall[3] == 1'b1) begin
 					//keep the original value
 			end
 			else begin

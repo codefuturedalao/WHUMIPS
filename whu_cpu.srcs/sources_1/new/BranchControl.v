@@ -46,7 +46,7 @@ module BranchControl(
 				end
 			end 
 			else if(i_branch == `IS_BRANCH && branch_flag == 1'b1) begin 
-				o_jump_branch_pc <= i_pc + {{14{i_imm26[15]}}, i_imm26, 2'b00};
+				o_jump_branch_pc <= i_pc + {{14{i_imm26[15]}}, i_imm26[15:0], 2'b00} + 4;
 			end
 			else begin
 				o_jump_branch_pc <= `ZERO_WORD;
@@ -80,7 +80,7 @@ module BranchControl(
 					branch_flag <= (~i_reg1_ndata[31] & i_reg1_ndata != 32'b0);
 				end	
 				`BLEZ_ALU_OPCODE: begin
-					branch_flag <= (~i_reg1_ndata[31] | i_reg1_ndata == 32'b0);
+					branch_flag <= (i_reg1_ndata[31] | i_reg1_ndata == 32'b0);
 				end	
 				`BLTZ_ALU_OPCODE: begin
 					branch_flag <= i_reg1_ndata[31];

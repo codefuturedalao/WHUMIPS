@@ -29,7 +29,7 @@ module MUX2(
 	output reg [`REG_WIDTH] o_reg3_data
     );
 	always
-		@(i_result_or_mem, i_alu_result, i_mem_data) begin
+		@(*) begin
 				if(i_result_or_mem == `REG3_FROM_RESULT) begin
 					o_reg3_data <= i_alu_result;
 				end
@@ -45,7 +45,7 @@ module MUX2(
 									o_reg3_data <= {{16{i_mem_data[15]}},i_mem_data[15:0]};
 							end
 							`MEM_SE_HALF_U: begin
-									o_reg3_data <= {{16{i_mem_data[15]}},i_mem_data[15:0]};
+									o_reg3_data <= {{16'b0},i_mem_data[15:0]};
 							end
 							`MEM_SE_WORD: begin
 									o_reg3_data <= i_mem_data;

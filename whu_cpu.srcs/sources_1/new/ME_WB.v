@@ -40,12 +40,12 @@ module ME_WB(
 						o_wb_reg3_addr <= 5'b00000;
 						o_wb_reg3_write <= `REG3_NO_WRITE;
 				end
-				else if(i_stall[4] == 1'b1 && i_stall[5] == 1'b0) begin
+				else if(i_stall[1] == 1'b1 && i_stall[0] == 1'b0) begin
 						o_wb_reg3_data <= `ZERO_WORD;
 						o_wb_reg3_addr <= 5'b00000;
 						o_wb_reg3_write <= `REG3_NO_WRITE;
 				end
-				else if(i_stall[4] == 1'b1 && i_stall[5] == 1'b1) begin
+				else if(i_stall[1] == 1'b1 && i_stall[0] == 1'b1) begin
 						//do nothing, keep the original value
 				end
 				else begin

@@ -64,7 +64,7 @@
 `define SRL_OPCODE 6'b000010
 //jump
 `define JR_OPCODE 6'b001000
-`define JALR_OPCODE 6'b0010001
+`define JALR_OPCODE 6'b001001
 //memory
 `define MFHI_OPCODE 6'b010000
 `define MFLO_OPCODE 6'b010010

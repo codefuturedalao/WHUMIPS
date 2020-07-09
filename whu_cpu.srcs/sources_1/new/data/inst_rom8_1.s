@@ -30,5 +30,15 @@ _start:
 	nop
 
 .org 0x60
+	ori $1,$0,0x0007
+	jr $2
 	ori $1,$0,0x0008
-		
+	ori $1,$0,0x1111
+	ori $1,$0,0x1100
+
+.org 0x80
+	nop
+
+_loop:
+	j _loop
+	nop

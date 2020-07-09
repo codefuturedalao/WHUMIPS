@@ -65,7 +65,7 @@ module ID_EX(
 				o_ex_reg3_write <= `REG3_NO_WRITE;
 				o_ex_pc <= `ZERO_WORD;
 			end
-			else if(i_flush == `IS_FLUSH || (i_stall[2] == 1'b1 && i_stall[3] == 1'b0)) begin
+			else if(i_flush == `IS_FLUSH || (i_stall[3] == 1'b1 && i_stall[2] == 1'b0)) begin
 				o_ex_reg1_data <= `ZERO_WORD;
 				o_ex_reg2_data <= `ZERO_WORD;
 				o_ex_reg3_addr <= 5'b00000;
@@ -78,7 +78,7 @@ module ID_EX(
 				o_ex_reg3_write <= `REG3_NO_WRITE;
 				o_ex_pc <= `ZERO_WORD;
 			end 
-			else if(i_stall[2] == 1'b1 && i_stall[3] == 1'b1) begin
+			else if(i_stall[3] == 1'b1 && i_stall[2] == 1'b1) begin
 				//keep the original value
 			end
 			else begin
