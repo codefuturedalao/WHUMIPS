@@ -25,6 +25,7 @@ module ALU(
 	input wire [`INST_ADDR_WIDTH] i_pc,
 	input wire [`REG_WIDTH] i_reg1_ndata,
 	input wire [`REG_WIDTH] i_reg2_ndata,
+	input wire [`REG_WIDTH] i_cp0_ndata,
 	input wire [15:0] i_imm16,
 	input wire [`ALUOP_WIDTH] i_aluop,
 	output reg o_exception_flag,
@@ -187,6 +188,18 @@ module ALU(
 				`JALR_ALU_OPCODE: begin
 					o_alu_result <= i_pc + 8;	
 				end
+			endcase
+		end
+/* priviliged instruction */
+	always
+		@(*) begin
+			case(i_aluop)
+					`MFC0_ALU_OPCODE: begin
+						o_alu_result <= i_cp0_ndata;
+					end
+					`MTC0_ALU_OPCODE: begin
+						o_alu_result <= i_reg2_ndata;
+					end
 			endcase
 		end
 /* access memory */

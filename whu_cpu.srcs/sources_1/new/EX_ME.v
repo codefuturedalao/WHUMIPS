@@ -33,6 +33,8 @@ module EX_ME(
 	input wire [2:0] i_ex_mem_byte_se,
 	input wire i_ex_result_or_mem,
 	input wire i_ex_reg3_write,
+	input wire i_ex_cp0_write,
+	input wire [2:0] i_ex_cp0_sel,
 	
 	output reg [`REG_WIDTH] o_mem_alu_result,
 	output reg [`REG_WIDTH] o_mem_reg2_ndata,
@@ -41,7 +43,9 @@ module EX_ME(
 	output reg o_mem_mem_en,
 	output reg [2:0] o_mem_mem_byte_se,
 	output reg o_mem_result_or_mem,
-	output reg o_mem_reg3_write
+	output reg o_mem_reg3_write,
+	output reg o_mem_cp0_write,
+	output reg [2:0] o_mem_cp0_sel
     );
 	always
 		@(posedge i_clk) begin
@@ -54,6 +58,8 @@ module EX_ME(
 						o_mem_mem_byte_se <= `MEM_SE_BYTE_U;
 						o_mem_result_or_mem <= `REG3_FROM_MEM; 
 						o_mem_reg3_write <= `REG3_NO_WRITE;
+						o_mem_cp0_write <= `CP0_NO_WRITE;
+						o_mem_cp0_sel <= 3'b000;
 				end
 				else if(i_stall[2] == 1'b1 && i_stall[1] == 0) begin
 						o_mem_alu_result <= `ZERO_WORD;
@@ -64,6 +70,8 @@ module EX_ME(
 						o_mem_mem_byte_se <= `MEM_SE_BYTE_U;
 						o_mem_result_or_mem <= `REG3_FROM_MEM; 
 						o_mem_reg3_write <= `REG3_NO_WRITE;
+						o_mem_cp0_write <= `CP0_NO_WRITE;
+						o_mem_cp0_sel <= 3'b000;
 				end
 				else if(i_stall[2] == 1'b1 && i_stall[1] == 1) begin
 						//do nothing, just keep the original value
@@ -77,6 +85,8 @@ module EX_ME(
 						o_mem_mem_byte_se <= i_ex_mem_byte_se;
 						o_mem_result_or_mem <= i_ex_result_or_mem;
 						o_mem_reg3_write <= i_ex_reg3_write;
+						o_mem_cp0_write <= i_ex_cp0_write; 
+						o_mem_cp0_sel <= i_ex_cp0_sel; 
 				end
 		end
 endmodule

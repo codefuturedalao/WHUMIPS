@@ -37,6 +37,8 @@ module ID_EX(
 	input wire i_id_result_or_mem,
 	input wire i_id_reg3_write,
 	input wire [`INST_ADDR_WIDTH] i_id_pc,
+	input wire i_id_cp0_write,
+	input wire [`REG_ADDR_WIDTH] i_id_rd_addr,
 
 	output reg [`REG_WIDTH] o_ex_reg1_data,
 	output reg [`REG_WIDTH] o_ex_reg2_data,
@@ -48,7 +50,9 @@ module ID_EX(
 	output reg [2:0] o_ex_mem_byte_se,
 	output reg o_ex_result_or_mem,
 	output reg o_ex_reg3_write,
-	output reg [`INST_ADDR_WIDTH] o_ex_pc
+	output reg [`INST_ADDR_WIDTH] o_ex_pc,
+	output reg o_ex_cp0_write,
+	output reg [`REG_ADDR_WIDTH] o_ex_rd_addr
     );
 	always
 		@(posedge i_clk) begin
@@ -64,6 +68,8 @@ module ID_EX(
 				o_ex_result_or_mem <= `REG3_FROM_MEM;
 				o_ex_reg3_write <= `REG3_NO_WRITE;
 				o_ex_pc <= `ZERO_WORD;
+				o_ex_cp0_write <= `CP0_NO_WRITE;
+				o_ex_rd_addr <= 5'b00000;
 			end
 			else if(i_flush == `IS_FLUSH || (i_stall[3] == 1'b1 && i_stall[2] == 1'b0)) begin
 				o_ex_reg1_data <= `ZERO_WORD;
@@ -77,6 +83,8 @@ module ID_EX(
 				o_ex_result_or_mem <= `REG3_FROM_MEM;
 				o_ex_reg3_write <= `REG3_NO_WRITE;
 				o_ex_pc <= `ZERO_WORD;
+				o_ex_cp0_write <= `CP0_NO_WRITE;
+				o_ex_rd_addr <= 5'b00000;
 			end 
 			else if(i_stall[3] == 1'b1 && i_stall[2] == 1'b1) begin
 				//keep the original value
@@ -93,6 +101,8 @@ module ID_EX(
 				o_ex_result_or_mem <= i_id_result_or_mem;
 				o_ex_reg3_write <= i_id_reg3_write;
 				o_ex_pc <= i_id_pc;
+				o_ex_cp0_write <= i_id_cp0_write;
+				o_ex_rd_addr <= i_id_rd_addr;
 			end
 		end
 endmodule

@@ -28,10 +28,14 @@ module ME_WB(
 	input wire [`REG_WIDTH] i_mem_reg3_data,
 	input wire [`REG_ADDR_WIDTH] i_mem_reg3_addr,
 	input wire i_mem_reg3_write,
+	input wire i_mem_cp0_write,
+	input wire [2:0] i_mem_cp0_sel,
 
 	output reg [`REG_WIDTH] o_wb_reg3_data,
 	output reg [`REG_ADDR_WIDTH] o_wb_reg3_addr,
-	output reg o_wb_reg3_write
+	output reg o_wb_reg3_write,
+	output reg o_wb_cp0_write,
+	output reg [2:0] o_wb_cp0_sel
     );
 	always
 		@(posedge i_clk) begin
@@ -39,11 +43,15 @@ module ME_WB(
 						o_wb_reg3_data <= `ZERO_WORD;
 						o_wb_reg3_addr <= 5'b00000;
 						o_wb_reg3_write <= `REG3_NO_WRITE;
+						o_wb_cp0_write <= `CP0_NO_WRITE;
+						o_wb_cp0_sel <= 3'b000;
 				end
 				else if(i_stall[1] == 1'b1 && i_stall[0] == 1'b0) begin
 						o_wb_reg3_data <= `ZERO_WORD;
 						o_wb_reg3_addr <= 5'b00000;
 						o_wb_reg3_write <= `REG3_NO_WRITE;
+						o_wb_cp0_write <= `CP0_NO_WRITE;
+						o_wb_cp0_sel <= 3'b000;
 				end
 				else if(i_stall[1] == 1'b1 && i_stall[0] == 1'b1) begin
 						//do nothing, keep the original value
@@ -52,6 +60,8 @@ module ME_WB(
 						o_wb_reg3_data <= i_mem_reg3_data;
 						o_wb_reg3_addr <= i_mem_reg3_addr;
 						o_wb_reg3_write <= i_mem_reg3_write;
+						o_wb_cp0_write <= i_mem_cp0_write; 
+						o_wb_cp0_sel <= i_mem_cp0_sel; 
 				end
 		end
 endmodule

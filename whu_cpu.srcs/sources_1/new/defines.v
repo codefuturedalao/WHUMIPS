@@ -33,7 +33,19 @@
 `define REG3_FROM_MEM 1'b0
 `define REG3_WRITE 1'b1
 `define REG3_NO_WRITE 1'b0
+`define CP0_WRITE 1'b1
+`define CP0_NO_WRITE 1'b0
+`define INT_ASSERTION 1'b1
+`define INT_NO_ASSERTION 1'b0
 
+/* CP0 Register */
+`define CP0_REG_COUNT 5'b01001
+`define CP0_REG_COMPARE 5'b01011
+`define CP0_REG_STATUS 5'b01100
+`define CP0_REG_CAUSE 5'b01101
+`define CP0_REG_EPC 5'b01110
+`define CP0_REG_PRID 5'b01111
+`define CP0_REG_CONFIG 5'b10000
 //
 `define ZERO_WORD 32'b0000_0000_0000_0000_0000_0000_0000_0000
 
@@ -107,9 +119,9 @@
 `define SYS_OPCODE 6'b001100
 /*privileged op*/
 `define PRIV_OPCODE 6'b010000
-`define ERET_OPCODE 6'b10000
-`define MFC0_OPCODE 6'b00000 
-`define MTC0_OPCODE 6'b00100
+`define ERET_OPCODE 5'b10000
+`define MFC0_OPCODE 5'b00000 
+`define MTC0_OPCODE 5'b00100
  
 
 /*    --------------- EX stage ----------------    */
@@ -177,6 +189,6 @@
 `define BREAK_ALU_OPCODE 6'b000000
 `define SYS_ALU_OPCODE 6'b000000
 //privileged op
-`define ERET_ALU_OPCODE 6'b000000
-`define MFC0_ALU_OPCODE 6'b000000
-`define MTC0_ALU_OPCODE 6'b000000
+`define ERET_ALU_OPCODE 6'b100111
+`define MFC0_ALU_OPCODE 6'b101000
+`define MTC0_ALU_OPCODE 6'b101001

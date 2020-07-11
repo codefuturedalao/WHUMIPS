@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 `include "defines.v"
+
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -23,10 +24,12 @@
 
 module Decoder(
     input [`INST_WIDTH] i_inst,  
+
     output reg o_reg1_read,
 	output reg o_reg2_read,
 	output wire [`REG_ADDR_WIDTH] o_reg1_addr,
 	output wire [`REG_ADDR_WIDTH] o_reg2_addr,
+	output wire [`REG_ADDR_WIDTH] o_rd_addr,
 	output reg [`REG_ADDR_WIDTH] o_reg3_addr,
 	output reg [`ALUOP_WIDTH] o_aluop,
 	output wire [25:0] o_imm26,
@@ -37,10 +40,13 @@ module Decoder(
 	output reg [3:0] o_mem_wen,	//write enable 
 	output reg [2:0] o_mem_byte_se,
 	output reg o_result_or_mem,
-	output reg o_reg3_write
+	output reg o_reg3_write,
+	output reg o_cp0_write
     );
+
 	assign o_reg1_addr = i_inst[25:21];
 	assign o_reg2_addr = i_inst[20:16];
+	assign o_rd_addr = i_inst[15:11];
 	assign o_imm26 = i_inst[25:0];
 	wire [5:0] opcode = i_inst[31:26];	
 	wire [5:0] imm5_0 = i_inst[5:0];
@@ -355,6 +361,45 @@ module Decoder(
 				end	
 				default: begin
 					//nothing
+				end
+			endcase
+		end
+
+/* priviledged instruction */
+	always
+		@(*) begin
+			o_cp0_write <= `CP0_NO_WRITE;
+			case(opcode)
+				`PRIV_OPCODE: begin
+						case(o_reg1_addr) 
+								`ERET_OPCODE: begin
+									o_cp0_write <= `CP0_NO_WRITE; // emmmm
+									o_aluop <= `ERET_ALU_OPCODE;
+								   	o_reg3_write <= `REG3_NO_WRITE;	
+									o_reg1_read <= `REG_NO_READ;
+									o_reg2_read <= `REG_NO_READ;
+								end
+								`MFC0_OPCODE: begin
+									o_cp0_write <= `CP0_NO_WRITE;
+									o_aluop <= `MFC0_ALU_OPCODE;
+								   	o_reg3_write <= `REG3_WRITE;	
+									o_reg1_read <= `REG_NO_READ;
+									o_reg3_addr <= i_inst[20:16];
+								end
+								`MTC0_OPCODE: begin
+									o_cp0_write <= `CP0_WRITE;
+									o_aluop <= `MTC0_ALU_OPCODE;
+								   	o_reg3_write <= `REG3_NO_WRITE;	
+									o_reg1_read <= `REG_NO_READ;
+									o_cp0_write <= `CP0_WRITE;
+								end
+								default: begin
+										//do nothing
+								end
+						endcase
+				end
+				default: begin
+						//do nothing
 				end
 			endcase
 		end

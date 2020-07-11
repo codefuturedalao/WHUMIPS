@@ -2,6 +2,7 @@
 verilog xil_defaultlib  \
 "../../../../whu_cpu.srcs/sources_1/new/ALU.v" \
 "../../../../whu_cpu.srcs/sources_1/new/BranchControl.v" \
+"../../../../whu_cpu.srcs/sources_1/new/CP0.v" \
 "../../../../whu_cpu.srcs/sources_1/new/Ctrl.v" \
 "../../../../whu_cpu.srcs/sources_1/new/DMEM.v" \
 "../../../../whu_cpu.srcs/sources_1/new/Decoder.v" \
@@ -12,6 +13,7 @@ verilog xil_defaultlib  \
 "../../../../whu_cpu.srcs/sources_1/new/ME_WB.v" \
 "../../../../whu_cpu.srcs/sources_1/new/MUX1.v" \
 "../../../../whu_cpu.srcs/sources_1/new/MUX2.v" \
+"../../../../whu_cpu.srcs/sources_1/new/MUX3.v" \
 "../../../../whu_cpu.srcs/sources_1/new/PC.v" \
 "../../../../whu_cpu.srcs/sources_1/new/RG.v" \
 "../../../../whu_cpu.srcs/sources_1/new/WHUCPU.v" \
