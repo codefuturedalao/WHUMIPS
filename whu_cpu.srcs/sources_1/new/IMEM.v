@@ -27,7 +27,7 @@ module IMEM(
    	output reg [`INST_WIDTH] o_inst	
     );
 
-	reg [31:0] imem [127:0];
+	reg [31:0] imem [512:0];
 
 	initial $readmemh("/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/data/inst_rom.data", imem);
 

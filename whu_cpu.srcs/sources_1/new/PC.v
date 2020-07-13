@@ -11,7 +11,8 @@
 // Target Devices: 
 // Tool Versions: 
 // Description: 
-// 
+// 		lack of ce signal 
+// 		may cause some unpredicatable problem
 // Dependencies: 
 // 
 // Revision:
@@ -25,6 +26,8 @@ module PC(
 	input wire i_clk,
 	input wire i_rst,
 	input wire [`STALL_WIDTH] i_stall,
+	input wire i_flush,
+	input wire [`INST_ADDR_WIDTH] i_new_pc,
 	input wire [`INST_ADDR_WIDTH] i_branch_pc,
 	input wire i_isbranch,
 	output reg [`INST_ADDR_WIDTH] o_pc
@@ -34,8 +37,11 @@ module PC(
 			if(i_rst == `RST_ENABLE) begin
 					o_pc <= `DEFAULT_PC;
 			end
-			else if(i_stall[5] == 1'b1 && i_stall[4] == 1'b0) begin
-					o_pc <= `DEFAULT_PC;
+			else if(i_flush == `IS_FLUSH) begin
+					o_pc <= i_new_pc;
+			end
+			else if(i_stall[5] == 1'b1 && i_stall[4] == 1'b0) begin //this will not happen 
+					o_pc <= `DEFAULT_PC;  
 			end
 			else if(i_stall[4] == 1'b1 && i_stall[4] == 1'b1) begin
 					//do nothing, just keep the original value

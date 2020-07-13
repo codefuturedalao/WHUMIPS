@@ -12,6 +12,8 @@ INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu
 INFO: [VRFC 10-311] analyzing module Decoder
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/EX_ME.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module EX_ME
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/Exp_Handler.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Exp_Handler
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/ID_EX.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module ID_EX
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/IF_ID.v" into library xil_defaultlib

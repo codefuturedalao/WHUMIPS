@@ -25,6 +25,7 @@ module EX_ME(
 	input wire i_clk,
 	input wire i_rst,
 	input wire [`STALL_WIDTH] i_stall,
+	input wire i_flush,
 	input wire [`REG_WIDTH] i_ex_alu_result,
 	input wire [`REG_WIDTH] i_ex_reg2_ndata,
 	input wire [`REG_ADDR_WIDTH] i_ex_reg3_addr,
@@ -35,6 +36,9 @@ module EX_ME(
 	input wire i_ex_reg3_write,
 	input wire i_ex_cp0_write,
 	input wire [2:0] i_ex_cp0_sel,
+	input wire i_ex_curr_in_dslot,
+	input wire [31:0] i_ex_exp_type,
+	input wire [`INST_ADDR_WIDTH] i_ex_pc,
 	
 	output reg [`REG_WIDTH] o_mem_alu_result,
 	output reg [`REG_WIDTH] o_mem_reg2_ndata,
@@ -45,7 +49,10 @@ module EX_ME(
 	output reg o_mem_result_or_mem,
 	output reg o_mem_reg3_write,
 	output reg o_mem_cp0_write,
-	output reg [2:0] o_mem_cp0_sel
+	output reg [2:0] o_mem_cp0_sel,
+	output reg [31:0] o_mem_exp_type,
+	output reg [`INST_ADDR_WIDTH] o_mem_pc,
+	output reg o_mem_curr_in_dslot
     );
 	always
 		@(posedge i_clk) begin
@@ -60,8 +67,11 @@ module EX_ME(
 						o_mem_reg3_write <= `REG3_NO_WRITE;
 						o_mem_cp0_write <= `CP0_NO_WRITE;
 						o_mem_cp0_sel <= 3'b000;
+						o_mem_pc <= `ZERO_WORD;
+						o_mem_exp_type <= `ZERO_WORD;
+						o_mem_curr_in_dslot <= `NOT_IN_DSLOT;
 				end
-				else if(i_stall[2] == 1'b1 && i_stall[1] == 0) begin
+				else if(i_flush == `IS_FLUSH || i_stall[2] == 1'b1 && i_stall[1] == 0) begin
 						o_mem_alu_result <= `ZERO_WORD;
 						o_mem_reg2_ndata <= `ZERO_WORD;
 						o_mem_reg3_addr <= 5'b00000;
@@ -72,6 +82,9 @@ module EX_ME(
 						o_mem_reg3_write <= `REG3_NO_WRITE;
 						o_mem_cp0_write <= `CP0_NO_WRITE;
 						o_mem_cp0_sel <= 3'b000;
+						o_mem_pc <= `ZERO_WORD;
+						o_mem_exp_type <= `ZERO_WORD;
+						o_mem_curr_in_dslot <= `NOT_IN_DSLOT;
 				end
 				else if(i_stall[2] == 1'b1 && i_stall[1] == 1) begin
 						//do nothing, just keep the original value
@@ -87,6 +100,9 @@ module EX_ME(
 						o_mem_reg3_write <= i_ex_reg3_write;
 						o_mem_cp0_write <= i_ex_cp0_write; 
 						o_mem_cp0_sel <= i_ex_cp0_sel; 
+						o_mem_pc <= i_ex_pc; 
+						o_mem_exp_type <= i_ex_exp_type; 
+						o_mem_curr_in_dslot <= i_ex_curr_in_dslot;
 				end
 		end
 endmodule

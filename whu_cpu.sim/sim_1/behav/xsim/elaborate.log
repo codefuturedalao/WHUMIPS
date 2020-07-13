@@ -20,6 +20,7 @@ Compiling module xil_defaultlib.CP0
 Compiling module xil_defaultlib.MUX3
 Compiling module xil_defaultlib.ALU
 Compiling module xil_defaultlib.EX_ME
+Compiling module xil_defaultlib.Exp_Handler
 Compiling module xil_defaultlib.MUX2
 Compiling module xil_defaultlib.ME_WB
 Compiling module xil_defaultlib.WHUCPU

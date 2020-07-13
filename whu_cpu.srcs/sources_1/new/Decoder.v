@@ -41,13 +41,20 @@ module Decoder(
 	output reg [2:0] o_mem_byte_se,
 	output reg o_result_or_mem,
 	output reg o_reg3_write,
-	output reg o_cp0_write
+	output reg o_cp0_write,
+	output wire [31:0] o_exp_type
     );
+	
+	reg syscall;
+	reg eret;
+	reg break;
+	reg inst_valid;
 
 	assign o_reg1_addr = i_inst[25:21];
 	assign o_reg2_addr = i_inst[20:16];
 	assign o_rd_addr = i_inst[15:11];
 	assign o_imm26 = i_inst[25:0];
+	assign o_exp_type = {20'b0, syscall, eret, break, inst_valid, 8'b0};
 	wire [5:0] opcode = i_inst[31:26];	
 	wire [5:0] imm5_0 = i_inst[5:0];
 	wire [4:0] imm20_16 = i_inst[20:16]; //the same as reg2_addr
@@ -55,6 +62,10 @@ module Decoder(
 /*arth and logical*/
 	always
 		@(*) begin
+			syscall <= `NO_EXCEPTION;
+			eret <= `NO_EXCEPTION; 
+			break <=  `NO_EXCEPTION;
+			inst_valid <= `INST_NO_VALID;
             o_reg1_read <= `REG_READ;
             o_reg2_read <= `REG_READ;
             o_reg3_addr <= i_inst[15:11];
@@ -69,107 +80,146 @@ module Decoder(
 					o_aluop <= `ADDI_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
 				end
 				`ADDIU_OPCODE: begin
 					o_aluop <= `ADDIU_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
 				end
 				`SLTI_OPCODE: begin
 					o_aluop <= `SLTI_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
 				end
 				`SLTIU_OPCODE: begin
 					o_aluop <= `SLTIU_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
 				end
 				`ANDI_OPCODE: begin
 					o_aluop <= `ANDI_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
 				end
 				`LUI_OPCODE: begin
 					o_aluop <= `LUI_ALU_OPCODE;
 					o_reg1_read <= `REG_NO_READ;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
 				end
 				`ORI_OPCODE: begin
 					o_aluop <= `ORI_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
 				end
 				`XORI_OPCODE: begin
 					o_aluop <= `XORI_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
 				end
 				`SPECIAL_OPCODE: begin
 					case(imm5_0)
 						`ADD_OPCODE: begin
 							o_aluop <= `ADD_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end
 						`ADDU_OPCODE: begin
 							o_aluop <= `ADDU_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	
 						`SUB_OPCODE: begin
 							o_aluop <= `SUB_ALU_OPCODE;	
+							inst_valid <= `INST_VALID;
 						end
 						`SUBU_OPCODE: begin	
 							o_aluop <= `SUBU_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end
 						`SLT_OPCODE: begin
 							o_aluop <= `SLT_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end
 						`SLTU_OPCODE: begin
 							o_aluop <= `SLTU_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end
 						`DIV_OPCODE: begin
 							o_aluop <= `DIV_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	 
 						`DIVU_OPCODE: begin
 							o_aluop <= `DIVU_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	 
 						`MULT_OPCODE: begin
 							o_aluop <= `MULT_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	 
 						`MULTU_OPCODE: begin
 							o_aluop <= `MULTU_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	 
 						`AND_OPCODE: begin
 							o_aluop <= `AND_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	 
 						`NOR_OPCODE: begin
 							o_aluop <= `NOR_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	 
 						`OR_OPCODE: begin
 							o_aluop <= `OR_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	 
 						`XOR_OPCODE: begin
 							o_aluop <= `XOR_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end	 
 						`SLLV_OPCODE: begin
 							o_aluop <= `SLLV_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end
 						`SLL_OPCODE: begin
 							o_aluop <= `SLL_ALU_OPCODE;
 							o_reg1_read <= `REG_NO_READ;
+							inst_valid <= `INST_VALID;
 						end
 						`SRAV_OPCODE: begin
 							o_aluop <= `SRAV_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end
 						`SRA_OPCODE: begin
 							o_aluop <= `SRA_ALU_OPCODE;
 							o_reg1_read <= `REG_NO_READ;
+							inst_valid <= `INST_VALID;
 						end
 						`SRLV_OPCODE: begin
 							o_aluop <= `SRLV_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
 						end
 						`SRL_OPCODE: begin
 							o_aluop <= `SRL_ALU_OPCODE;
 							o_reg1_read <= `REG_NO_READ;
+							inst_valid <= `INST_VALID;
+						end
+						/*trap inst*/
+						`BREAK_OPCODE: begin
+							o_aluop <= `BREAK_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
+							break <= `IS_EXCEPTION;
+						end
+						`SYS_OPCODE: begin
+							o_aluop <= `SYS_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
+							syscall <= `IS_EXCEPTION;
 						end
 						default: begin
 							//nothing
@@ -200,21 +250,25 @@ module Decoder(
 					o_aluop <= `BEQ_ALU_OPCODE;
 					o_branch <= `IS_BRANCH;
 					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
 				end	
 				`BNE_OPCODE: begin
 					o_aluop <= `BNE_ALU_OPCODE;
 					o_branch <= `IS_BRANCH;
 					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
 				end	
 				`BGTZ_OPCODE: begin
 					o_aluop <= `BGTZ_ALU_OPCODE;
 					o_branch <= `IS_BRANCH;
 					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
 				end	
 				`BLEZ_OPCODE: begin
 					o_aluop <= `BLEZ_ALU_OPCODE;
 					o_branch <= `IS_BRANCH;
 					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
 				end	
 				`J_OPCODE: begin
 					o_aluop <= `J_ALU_OPCODE;
@@ -223,6 +277,7 @@ module Decoder(
 					o_reg1_read <= `REG_NO_READ;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
 				end
 				`JAL_OPCODE: begin
 					o_aluop <= `JAL_ALU_OPCODE;
@@ -231,6 +286,7 @@ module Decoder(
 					o_reg1_read <= `REG_NO_READ;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= 5'b11111;
+					inst_valid <= `INST_VALID;
 				end
 				`BGELTZ_OPCODE: begin
 					case(imm20_16)
@@ -239,24 +295,28 @@ module Decoder(
 							o_reg2_read <= `REG_NO_READ;
 							o_branch <= `IS_BRANCH;
 							o_reg3_write <= `REG3_NO_WRITE;
+							inst_valid <= `INST_VALID;
 						end
 						`BLTZ_OPCODE: begin
 							o_aluop <= `BLTZ_ALU_OPCODE;
 							o_reg2_read <= `REG_NO_READ;
 							o_branch <= `IS_BRANCH;
 							o_reg3_write <= `REG3_NO_WRITE;
+							inst_valid <= `INST_VALID;
 						end
 						`BGEZAL_OPCODE: begin
 							o_aluop <= `BGEZAL_ALU_OPCODE;
 							o_reg2_read <= `REG_NO_READ;
 							o_reg3_addr <= 5'b11111;
 							o_branch <= `IS_BRANCH;
+							inst_valid <= `INST_VALID;
 						end
 						`BLTZAL_OPCODE: begin
 							o_aluop <= `BLTZAL_ALU_OPCODE;
 							o_reg2_read <= `REG_NO_READ;
 							o_reg3_addr <= 5'b11111;
 							o_branch <= `IS_BRANCH;
+							inst_valid <= `INST_VALID;
 						end
 					endcase
 				end
@@ -268,11 +328,13 @@ module Decoder(
 							o_reg2_read <= `REG_NO_READ;
 							o_reg3_addr <= 5'b11111;
 							o_reg3_write <= `REG3_NO_WRITE;
+							inst_valid <= `INST_VALID;
 						end	
 						`JALR_OPCODE: begin
 							o_aluop <= `JALR_ALU_OPCODE;
 							o_jump <= `IS_JUMP;
 							o_reg2_read <= `REG_NO_READ;
+							inst_valid <= `INST_VALID;
 						end	
 						default: begin
 							//nothing	
@@ -305,6 +367,7 @@ module Decoder(
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
 				end	
 				`LBU_OPCODE: begin
 					o_aluop <= `LBU_ALU_OPCODE;
@@ -313,6 +376,7 @@ module Decoder(
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
 				end	
 				`LH_OPCODE: begin
 					o_aluop <= `LH_ALU_OPCODE;
@@ -321,6 +385,7 @@ module Decoder(
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
 				end	
 				`LHU_OPCODE: begin
 					o_aluop <= `LHU_ALU_OPCODE;
@@ -329,6 +394,7 @@ module Decoder(
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
 				end	
 				`LW_OPCODE: begin
 					o_aluop <= `LW_ALU_OPCODE;
@@ -337,6 +403,7 @@ module Decoder(
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];			
 					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
 				end	
 				`SB_OPCODE: begin
 					o_aluop <= `SB_ALU_OPCODE;
@@ -344,6 +411,7 @@ module Decoder(
 					o_mem_wen <= 4'b0001;
 					//o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
 				end	
 				`SH_OPCODE: begin
 					o_aluop <= `SH_ALU_OPCODE;
@@ -351,6 +419,7 @@ module Decoder(
 					o_mem_wen <= 4'b0011;
 					//o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
 				end	
 				`SW_OPCODE: begin
 					o_aluop <= `SW_ALU_OPCODE;
@@ -358,6 +427,7 @@ module Decoder(
 					o_mem_wen <= 4'b1111;
 					//o_mem_byte_se <= `MEM_SE_BYTE;
 					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
 				end	
 				default: begin
 					//nothing
@@ -378,6 +448,8 @@ module Decoder(
 								   	o_reg3_write <= `REG3_NO_WRITE;	
 									o_reg1_read <= `REG_NO_READ;
 									o_reg2_read <= `REG_NO_READ;
+									inst_valid <= `INST_VALID;
+									eret <= `IS_EXCEPTION;
 								end
 								`MFC0_OPCODE: begin
 									o_cp0_write <= `CP0_NO_WRITE;
@@ -385,6 +457,7 @@ module Decoder(
 								   	o_reg3_write <= `REG3_WRITE;	
 									o_reg1_read <= `REG_NO_READ;
 									o_reg3_addr <= i_inst[20:16];
+									inst_valid <= `INST_VALID;
 								end
 								`MTC0_OPCODE: begin
 									o_cp0_write <= `CP0_WRITE;
@@ -392,6 +465,7 @@ module Decoder(
 								   	o_reg3_write <= `REG3_NO_WRITE;	
 									o_reg1_read <= `REG_NO_READ;
 									o_cp0_write <= `CP0_WRITE;
+									inst_valid <= `INST_VALID;
 								end
 								default: begin
 										//do nothing

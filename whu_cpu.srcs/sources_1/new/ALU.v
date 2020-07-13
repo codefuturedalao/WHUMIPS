@@ -28,8 +28,9 @@ module ALU(
 	input wire [`REG_WIDTH] i_cp0_ndata,
 	input wire [15:0] i_imm16,
 	input wire [`ALUOP_WIDTH] i_aluop,
-	output reg o_exception_flag,
-	output reg [`REG_WIDTH] o_alu_result
+	input wire [31:0] i_exp_type,
+	output reg [`REG_WIDTH] o_alu_result,
+	output wire [31:0] o_exp_type
     );
 	wire [32:0] add_result_reg; //the most significant bit can be used for judge overflow
 	wire [32:0] sub_result_reg; //
@@ -37,6 +38,9 @@ module ALU(
 	wire [32:0] sub_result_imm; //
 	wire [31:0] imm32_sign; 
 	wire [31:0] imm32_unsign; 
+	reg overflow;
+	reg no_align;
+	assign o_exp_type = {i_exp_type[31:14], overflow, no_align, i_exp_type[11:0]};
 
 	assign imm32_sign = {{16{i_imm16[15]}},i_imm16[15:0]};
 	assign imm32_unsign = {16'b0,i_imm16[15:0]};
@@ -47,11 +51,12 @@ module ALU(
 
 	always
 		@(*) begin
-			o_exception_flag <= `NO_EXCEPTION;
+			overflow <= `NO_EXCEPTION;
+			no_align <= `NO_EXCEPTION;
 			case(i_aluop)
 				`ADD_ALU_OPCODE: begin
 					if(add_result_reg[32] ^ add_result_reg[31] == 1'b1) begin //overflow
-						o_exception_flag <= `IS_EXCEPTION;
+						overflow <= `IS_EXCEPTION;
 						o_alu_result <= `ZERO_WORD;
 					end else begin	
 						o_alu_result <= add_result_reg[31:0];
@@ -59,7 +64,7 @@ module ALU(
 				end	
 				`ADDI_ALU_OPCODE: begin
 					if(add_result_imm[32] ^ add_result_imm[31] == 1'b1) begin //overflow
-						o_exception_flag <= `IS_EXCEPTION;
+						overflow <= `IS_EXCEPTION;
 						o_alu_result <= `ZERO_WORD;
 					end else begin	
 						o_alu_result <= add_result_imm[31:0];
@@ -73,7 +78,7 @@ module ALU(
 				end	
 				`SUB_ALU_OPCODE: begin
 					if(sub_result_reg[32] ^ sub_result_reg[31] == 1'b1) begin //overflow
-						o_exception_flag <= `IS_EXCEPTION;
+						overflow <= `IS_EXCEPTION;
 						o_alu_result <= `ZERO_WORD;
 					end else begin	
 						o_alu_result <= sub_result_reg[31:0];
@@ -209,12 +214,12 @@ module ALU(
 				//lb and lbu is the same as addiu
 				`LH_ALU_OPCODE: begin
 					o_alu_result <= add_result_imm;
-					o_exception_flag <= add_result_imm[0];
+					no_align <= add_result_imm[0];
 				end
 				//lhu is the same as lh
 				`LW_ALU_OPCODE: begin
 					o_alu_result <= add_result_imm;
-					o_exception_flag <= add_result_imm[1] | add_result_imm[0];
+					no_align <= add_result_imm[1] | add_result_imm[0];
 				end
 				//sb is the same as addiu
 				//sh is the same as lh

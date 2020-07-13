@@ -33,12 +33,9 @@ module Ctrl(
 	input wire i_mem_reg3_write,
 	
 	output reg [`STALL_WIDTH] o_stall,
-	output wire o_flush,
 	output reg [1:0] o_forwardA,
 	output reg [1:0] o_forwardB
     );
-	/*control hazard*/
-	assign o_flush = 1'b0; //for exception
 	/*data hazard*/
 	//forward 
 	always

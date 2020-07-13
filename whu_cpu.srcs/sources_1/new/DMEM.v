@@ -30,7 +30,7 @@ module DMEM(
 
 	output reg [`REG_WIDTH] o_data
     );
-	reg [7:0] dmem [127:0];	
+	reg [7:0] dmem [512:0];	
 	//read
 	always
 		@(*) begin

@@ -6,6 +6,7 @@
 `define ALUOP_WIDTH 5:0
 `define STALL_WIDTH 5:0
 `define DEFAULT_PC 32'h0000_0000
+`define EXP_DEFAULT_PC 32'hBFC0_0380
 
 /*control signal*/
 `define RST_ENABLE 1'b1
@@ -37,6 +38,11 @@
 `define CP0_NO_WRITE 1'b0
 `define INT_ASSERTION 1'b1
 `define INT_NO_ASSERTION 1'b0
+//make no valid is 1
+`define INST_VALID 1'b0
+`define INST_NO_VALID 1'b1
+`define IN_DSLOT 1'b1
+`define NOT_IN_DSLOT 1'b0
 
 /* CP0 Register */
 `define CP0_REG_COUNT 5'b01001
@@ -46,6 +52,33 @@
 `define CP0_REG_EPC 5'b01110
 `define CP0_REG_PRID 5'b01111
 `define CP0_REG_CONFIG 5'b10000
+
+`define STATUS_EXL 1
+`define STATUS_IE 0
+`define STATUS_IM 15:8
+`define CAUSE_IP 15:8
+`define CAUSE_BD 31 
+`define CAUSE_EXCCODE 6:2
+
+/* EXCCODE */
+`define INT_EXC 5'b00000
+`define ADEL_EXC 5'b00100
+`define ADES_EXC 5'b00101
+`define OV_EXC 5'b01100
+`define SYS_EXC 5'b01000
+`define BP_EXC 5'b01001
+`define RI_EXC 5'b01010
+
+/* EXP TYPE*/
+`define NO_EXP_TYPE 32'h0000_0000
+`define INT_EXP_TYPE 32'h0000_0001
+`define INST_VALID_EXP_TYPE 32'h0000_0002
+`define SYS_EXP_TYPE 32'h0000_0003
+`define ERET_EXP_TYPE 32'h0000_0004
+`define BREAK_EXP_TYPE 32'h0000_0005
+`define OV_EXP_TYPE 32'h0000_0006
+`define ALIGN_EXP_TYPE 32'h0000_0007
+
 //
 `define ZERO_WORD 32'b0000_0000_0000_0000_0000_0000_0000_0000
 
@@ -186,8 +219,8 @@
 `define MTHI_ALU_OPCODE 6'b000000
 `define MTLO_ALU_OPCODE 6'b000000
 // trap
-`define BREAK_ALU_OPCODE 6'b000000
-`define SYS_ALU_OPCODE 6'b000000
+`define BREAK_ALU_OPCODE 6'b000000   //the same as nop
+`define SYS_ALU_OPCODE 6'b000000     //the same as nop
 //privileged op
 `define ERET_ALU_OPCODE 6'b100111
 `define MFC0_ALU_OPCODE 6'b101000

@@ -25,6 +25,7 @@ module ME_WB(
 	input wire i_clk,
 	input wire i_rst,
 	input wire [`STALL_WIDTH] i_stall,
+	input wire i_flush,
 	input wire [`REG_WIDTH] i_mem_reg3_data,
 	input wire [`REG_ADDR_WIDTH] i_mem_reg3_addr,
 	input wire i_mem_reg3_write,
@@ -40,6 +41,13 @@ module ME_WB(
 	always
 		@(posedge i_clk) begin
 				if(i_rst == `RST_ENABLE) begin
+						o_wb_reg3_data <= `ZERO_WORD;
+						o_wb_reg3_addr <= 5'b00000;
+						o_wb_reg3_write <= `REG3_NO_WRITE;
+						o_wb_cp0_write <= `CP0_NO_WRITE;
+						o_wb_cp0_sel <= 3'b000;
+				end
+				else if(i_flush == `IS_FLUSH) begin
 						o_wb_reg3_data <= `ZERO_WORD;
 						o_wb_reg3_addr <= 5'b00000;
 						o_wb_reg3_write <= `REG3_NO_WRITE;
