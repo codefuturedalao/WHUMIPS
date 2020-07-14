@@ -33,6 +33,14 @@
 `define REG3_FROM_MEM 1'b0
 `define REG3_WRITE 1'b1
 `define REG3_NO_WRITE 1'b0
+`define HI_WRITE 1'b1
+`define HI_NO_WRITE 1'b0
+`define LO_WRITE 1'b1
+`define LO_NO_WRITE 1'b0
+`define HI_READ 1'b1
+`define HI_NO_READ 1'b0
+`define LO_READ 1'b1
+`define LO_NO_READ 1'b0
 `define CP0_WRITE 1'b1
 `define CP0_NO_WRITE 1'b0
 `define INT_ASSERTION 1'b1
