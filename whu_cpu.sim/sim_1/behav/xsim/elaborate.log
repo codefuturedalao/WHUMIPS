@@ -9,6 +9,7 @@ Starting simulation data flow analysis
 Completed simulation data flow analysis
 Time Resolution for simulation is 1ps
 Compiling module xil_defaultlib.PC
+Compiling module xil_defaultlib.Sram_Controller
 Compiling module xil_defaultlib.IF_ID
 Compiling module xil_defaultlib.Decoder
 Compiling module xil_defaultlib.RG

@@ -7,10 +7,11 @@
 `define STALL_WIDTH 5:0
 `define DEFAULT_PC 32'h0000_0000
 `define EXP_DEFAULT_PC 32'hBFC0_0380
+`define WEN_ADDR 3:0
 
 /*control signal*/
-`define RST_ENABLE 1'b1
-`define RST_DISABLE 1'b0
+`define RST_ENABLE 1'b0     //low valid
+`define RST_DISABLE 1'b1
 `define IS_FLUSH 1'b1
 `define NO_FLUSH 1'b0
 `define REG_READ 1'b1
@@ -38,6 +39,10 @@
 `define CP0_NO_WRITE 1'b0
 `define INT_ASSERTION 1'b1
 `define INT_NO_ASSERTION 1'b0
+`define CHIP_ENABLE 1'b1
+`define CHIP_DISABLE 1'b0
+`define IS_STALL 1'b1
+`define NO_STALL 1'b0
 //make no valid is 1
 `define INST_VALID 1'b0
 `define INST_NO_VALID 1'b1

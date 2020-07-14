@@ -33,7 +33,7 @@ module DMEM(
 	reg [7:0] dmem [512:0];	
 	//read
 	always
-		@(*) begin
+		@(posedge i_clk) begin
 				if(i_mem_en == `MEM_ENABLE && i_mem_wen == 4'b0000) begin
 					o_data <= {dmem[i_addr + 3], dmem[i_addr + 2], dmem[i_addr + 1],  dmem[i_addr]};
 				end

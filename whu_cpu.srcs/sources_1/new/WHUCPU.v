@@ -28,6 +28,9 @@ module WHUCPU(
 	input wire [`REG_WIDTH] i_dmem_data,
 	input wire [`REG_WIDTH] i_imem_data,
 	output wire [`INST_ADDR_WIDTH] o_imem_addr,
+	output wire [`REG_WIDTH] o_imem_data,
+	output wire [3:0] o_imem_wen,
+	output wire o_imem_en,
 	output wire [`REG_WIDTH] o_dmem_addr,
 	output wire [`REG_WIDTH] o_dmem_data,
 	output wire [3:0] o_dmem_wen,
@@ -39,19 +42,34 @@ module WHUCPU(
 	wire is_branch;
 	wire flush;
 	wire [`INST_ADDR_WIDTH] if_pc;
+	wire imem_ce;
 	wire [`INST_ADDR_WIDTH] exp_pc;
+	wire stall_req_from_if;
 	PC my_pc(
 			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_branch_pc(branch_pc), 
 			.i_isbranch(is_branch), .i_flush(flush), .i_new_pc(exp_pc),
 
-			.o_pc(if_pc)
+			.o_pc(if_pc), .o_ce(imem_ce)
 	);
+
+
+	wire [`INST_WIDTH] if_inst; 
+	wire if_sram_stall;
+	wire mem_sram_stall; 
+	Sram_Controller my_imem_controller(
+		.i_clk(i_clk), .i_rst(i_rst), .i_en(imem_ce), .i_din(`ZERO_WORD),
+		.i_addr(if_pc), .i_wen(4'b0000), .i_dout(i_imem_data), .i_stall(if_sram_stall), 
+		
+		.o_en(o_imem_en), .o_wen(o_imem_wen), .o_din(o_imem_data), .o_stall_req(stall_req_from_if),
+		.o_data(if_inst), .o_addr(o_imem_addr)
+	);
+
     assign o_imem_addr = if_pc;
 	wire [`INST_ADDR_WIDTH] id_pc;
 	wire [`INST_WIDTH] id_inst;
 	IF_ID my_if_id(
 			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_flush(flush), 
-			.i_if_inst(i_imem_data), .i_if_pc(if_pc), 
+			.i_if_inst(if_inst), .i_if_pc(if_pc), 
 			
 			.o_id_inst(id_inst), .o_id_pc(id_pc)
 	);
@@ -125,12 +143,13 @@ module WHUCPU(
 	wire ex_result_or_mem;
 	wire [`REG_ADDR_WIDTH] mem_reg3_addr;
 	wire mem_reg3_write;
+	wire stall_req_from_mem;
 	Ctrl my_ctrl(
 			.i_id_reg1_addr(id_reg1_addr), .i_id_reg2_addr(id_reg2_addr), .i_id_reg1_read(id_reg1_read), .i_id_reg2_read(id_reg2_read),
 			.i_ex_reg3_addr(ex_reg3_addr), .i_ex_reg3_write(ex_reg3_write), .i_ex_result_or_mem(ex_result_or_mem), 
-			.i_mem_reg3_addr(mem_reg3_addr), .i_mem_reg3_write(mem_reg3_write), 
+			.i_mem_reg3_addr(mem_reg3_addr), .i_mem_reg3_write(mem_reg3_write), .i_stall_req_from_if(stall_req_from_if), .i_stall_req_from_mem(stall_req_from_mem),
 
-			.o_stall(stall), .o_forwardA(forwardA), .o_forwardB(forwardB)
+			.o_stall(stall), .o_if_sram_stall(if_sram_stall), .o_mem_sram_stall(mem_sram_stall), .o_forwardA(forwardA), .o_forwardB(forwardB)
 	);	
 	
 
@@ -215,9 +234,10 @@ module WHUCPU(
 
 	wire [2:0] mem_mem_byte_se;
 	wire mem_result_or_mem;
-	assign o_dmem_addr = mem_alu_result;
 	wire [31:0] mem_exp_type;
-	wire [3:0] dmem_wen;
+	wire [3:0] mem_mem_wen;
+	wire mem_mem_en;
+	wire [`REG_WIDTH] mem_mem_data;
 	EX_ME my_ex_me(
 			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_ex_alu_result(ex_alu_result), .i_ex_reg2_ndata(ex_reg2_data),
 			.i_ex_reg3_addr(ex_reg3_addr), .i_ex_mem_wen(ex_mem_wen), .i_ex_mem_en(ex_mem_en), .i_ex_mem_byte_se(ex_mem_byte_se),
@@ -226,21 +246,34 @@ module WHUCPU(
 			.i_ex_pc(ex_pc), .i_ex_exp_type(ex_exp_ntype), .i_ex_curr_in_dslot(ex_curr_in_dslot),
 			.i_flush(flush),
 
-			.o_mem_alu_result(mem_alu_result), .o_mem_reg2_ndata(o_dmem_data), .o_mem_reg3_addr(mem_reg3_addr), .o_mem_mem_wen(dmem_wen),
-			.o_mem_mem_en(o_dmem_en), .o_mem_mem_byte_se(mem_mem_byte_se), .o_mem_result_or_mem(mem_result_or_mem), .o_mem_reg3_write(mem_reg3_write),
+			.o_mem_alu_result(mem_alu_result), .o_mem_reg2_ndata(mem_mem_data), .o_mem_reg3_addr(mem_reg3_addr), .o_mem_mem_wen(mem_mem_wen),
+			.o_mem_mem_en(mem_mem_en), .o_mem_mem_byte_se(mem_mem_byte_se), .o_mem_result_or_mem(mem_result_or_mem), .o_mem_reg3_write(mem_reg3_write),
 			.o_mem_cp0_write(mem_cp0_write), .o_mem_cp0_sel(mem_cp0_sel),
 			.o_mem_pc(mem_pc), .o_mem_exp_type(mem_exp_type), .o_mem_curr_in_dslot(mem_curr_in_dslot)
 	);
 
-	Exp_Handler my_exp_handler(
-			.i_exp_type(mem_exp_type), .i_pc(mem_pc), .i_cp0_status(mem_cp0_status), .i_cp0_cause(mem_cp0_cause), .i_cp0_epc(mem_cp0_epc),
-			.i_wb_cp0_sel(wb_cp0_sel), .i_wb_cp0_data(wb_cp0_data), .i_wb_rd_addr(wb_reg3_addr), .i_wb_cp0_write(wb_cp0_write), .i_mem_wen(dmem_wen),
-
-			.o_mem_wen(o_dmem_wen), .o_exp_type(mem_exp_ntype), .o_exp_pc(exp_pc), .o_flush(flush)
+	wire exp_mem_en;
+	wire [`REG_WIDTH] dmem_data;
+	Sram_Controller my_dmem_controller(
+		.i_clk(i_clk), .i_rst(i_rst), .i_en(exp_mem_en), .i_din(mem_mem_data), .i_addr(mem_alu_result),
+		.i_wen(mem_mem_wen), .i_dout(i_dmem_data),
+		.i_stall(mem_sram_stall),
+		.o_en(o_dmem_en), .o_wen(o_dmem_wen), .o_din(o_dmem_data), .o_stall_req(stall_req_from_mem),
+		.o_data(dmem_data), .o_addr(o_dmem_addr)
+		
 	);
 
+
+	Exp_Handler my_exp_handler(
+			.i_exp_type(mem_exp_type), .i_pc(mem_pc), .i_cp0_status(mem_cp0_status), .i_cp0_cause(mem_cp0_cause), .i_cp0_epc(mem_cp0_epc),
+			.i_wb_cp0_sel(wb_cp0_sel), .i_wb_cp0_data(wb_cp0_data), .i_wb_rd_addr(wb_reg3_addr), .i_wb_cp0_write(wb_cp0_write), .i_mem_en(mem_mem_en),
+
+			.o_mem_en(exp_mem_en), .o_exp_type(mem_exp_ntype), .o_exp_pc(exp_pc), .o_flush(flush)
+	);
+
+
 	MUX2 my_mux2(
-			.i_result_or_mem(mem_result_or_mem), .i_alu_result(mem_alu_result), .i_mem_data(i_dmem_data), .i_mem_byte_se(mem_mem_byte_se), 
+			.i_result_or_mem(mem_result_or_mem), .i_alu_result(mem_alu_result), .i_mem_data(dmem_data), .i_mem_byte_se(mem_mem_byte_se), 
 
 			.o_reg3_data(mem_reg3_data)
 	);

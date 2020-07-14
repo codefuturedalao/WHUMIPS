@@ -30,11 +30,23 @@ module PC(
 	input wire [`INST_ADDR_WIDTH] i_new_pc,
 	input wire [`INST_ADDR_WIDTH] i_branch_pc,
 	input wire i_isbranch,
-	output reg [`INST_ADDR_WIDTH] o_pc
+	output reg [`INST_ADDR_WIDTH] o_pc,
+	output reg o_ce
     );
+
+	reg status;
 	always
 		@(posedge i_clk) begin
 			if(i_rst == `RST_ENABLE) begin
+				o_ce <= `CHIP_DISABLE;
+			end
+			else begin
+				o_ce <= `CHIP_ENABLE;
+			end
+		end
+	always
+		@(posedge i_clk) begin
+			if(o_ce == `CHIP_DISABLE) begin
 					o_pc <= `DEFAULT_PC;
 			end
 			else if(i_flush == `IS_FLUSH) begin
@@ -43,7 +55,7 @@ module PC(
 			else if(i_stall[5] == 1'b1 && i_stall[4] == 1'b0) begin //this will not happen 
 					o_pc <= `DEFAULT_PC;  
 			end
-			else if(i_stall[4] == 1'b1 && i_stall[4] == 1'b1) begin
+			else if(i_stall[5] == 1'b1 && i_stall[4] == 1'b1) begin
 					//do nothing, just keep the original value
 			end
 			else if(i_isbranch == 1'b1) begin

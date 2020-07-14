@@ -22,8 +22,11 @@
 
 
 module IMEM(
-	input wire i_en,
+	input wire i_clk,
+	input wire i_mem_en,
 	input wire [`INST_ADDR_WIDTH] i_pc,
+	input wire [3:0] i_mem_wen,
+	input wire [`REG_WIDTH] i_data,
    	output reg [`INST_WIDTH] o_inst	
     );
 
@@ -32,8 +35,8 @@ module IMEM(
 	initial $readmemh("/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/data/inst_rom.data", imem);
 
 	always
-		@(*) begin
-				if(i_en == `MEM_ENABLE) begin
+		@(posedge i_clk) begin
+				if(i_mem_en == `CHIP_ENABLE) begin
 					o_inst <= imem[i_pc[15:2]];
 				end
 				else begin

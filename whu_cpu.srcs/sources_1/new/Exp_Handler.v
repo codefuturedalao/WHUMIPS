@@ -31,9 +31,9 @@ module Exp_Handler(
 		input wire [`REG_WIDTH] i_wb_cp0_data,
 		input wire [`REG_ADDR_WIDTH] i_wb_rd_addr,
 		input wire i_wb_cp0_write,
-		input wire [3:0] i_mem_wen,
+		input wire i_mem_en,
 
-		output reg [3:0] o_mem_wen,
+		output reg o_mem_en,
 		output reg [31:0] o_exp_type,
 		output reg [`INST_ADDR_WIDTH] o_exp_pc,
 		output reg o_flush
@@ -108,11 +108,11 @@ module Exp_Handler(
 		always
 			@(*) begin
 				if(~(|o_exp_type) == 1'b0) begin //exception occur
-						o_mem_wen <= 4'b0000;
+						o_mem_en <= `CHIP_DISABLE;
 						o_flush <= `IS_FLUSH;
 				end
 				else begin
-						o_mem_wen <= i_mem_wen;
+						o_mem_en <= i_mem_en;
 						o_flush <= `NO_FLUSH;
 				end
 			end
