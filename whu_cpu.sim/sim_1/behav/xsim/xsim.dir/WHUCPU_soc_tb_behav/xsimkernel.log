@@ -2,3 +2,6 @@ Running: xsim.dir/WHUCPU_soc_tb_behav/xsimk.exe -simmode gui -wdb WHUCPU_soc_tb_
 Design successfully loaded
 Design Loading Memory Usage: 6024 KB (Peak: 6024 KB)
 Design Loading CPU Usage: 77 ms
+Simulation completed
+Simulation Memory Usage: 6892 KB (Peak: 6892 KB)
+Simulation CPU Usage: 93 ms

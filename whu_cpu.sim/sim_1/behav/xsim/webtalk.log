@@ -2,13 +2,13 @@
 # Webtalk v2019.2 (64-bit)
 # SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
 # IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
-# Start of session at: Wed Jul 15 21:18:52 2020
-# Process ID: 12560
+# Start of session at: Wed Jul 15 23:33:23 2020
+# Process ID: 11472
 # Current directory: D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.sim/sim_1/behav/xsim
 # Command line: wbtcv.exe -mode batch -source D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.sim/sim_1/behav/xsim/xsim.dir/WHUCPU_soc_tb_behav/webtalk/xsim_webtalk.tcl -notrace
 # Log file: D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.sim/sim_1/behav/xsim/webtalk.log
 # Journal file: D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.sim/sim_1/behav/xsim\webtalk.jou
 #-----------------------------------------------------------
 source D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.sim/sim_1/behav/xsim/xsim.dir/WHUCPU_soc_tb_behav/webtalk/xsim_webtalk.tcl -notrace
-webtalk_transmit: Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 95.195 ; gain = 17.809
-INFO: [Common 17-206] Exiting Webtalk at Wed Jul 15 21:19:03 2020...
+webtalk_transmit: Time (s): cpu = 00:00:00 ; elapsed = 00:00:09 . Memory (MB): peak = 95.176 ; gain = 17.820
+INFO: [Common 17-206] Exiting Webtalk at Wed Jul 15 23:33:33 2020...

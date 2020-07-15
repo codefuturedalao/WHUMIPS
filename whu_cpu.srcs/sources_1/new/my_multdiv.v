@@ -73,6 +73,38 @@ module my_multdiv(
     .m_axis_dout_tvalid(dout_tvalid),
     .m_axis_dout_tdata(div_result)
   );
+  
+  unsign_div u_div(
+    .aclk(i_clk),
+    .s_axis_divisor_tvalid(divisor_tvalid),
+    .s_axis_divisor_tdata(i_reg1_ndata),
+    .s_axis_dividend_tvalid(dividend_tvalid),
+    .s_axis_dividend_tdata(i_reg2_ndata),
+    .m_axis_dout_tvalid(dout_tvalid),
+    .m_axis_dout_tdata(divu_result)
+  );
 
+always
+		@(*) begin
+			case(i_aluop)
+				`MULT_OPCODE: begin
+					o_hi_result <= mult_result[63:32];
+					o_lo_result<=mult_result[31:0];
+				end	
+				`MULTU_OPCODE: begin
+					o_hi_result <= multu_result[63:32];
+					o_lo_result<=multu_result[31:0];
+				end	
+				`DIV_OPCODE: begin
+					o_hi_result <= div_result[63:32];
+					o_lo_result<=div_result[31:0];
+				end	
+				`DIVU_OPCODE: begin
+					o_hi_result <= divu_result[63:32];
+					o_lo_result<=divu_result[31:0];
+				end	
+				
+			endcase
+		end
   
 endmodule
