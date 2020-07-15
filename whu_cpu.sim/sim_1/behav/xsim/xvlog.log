@@ -1,38 +1,40 @@
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/ALU.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/ALU.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module ALU
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/BranchControl.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/BranchControl.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module BranchControl
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/CP0.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/CP0.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module CP0
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/Ctrl.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/Ctrl.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module Ctrl
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/DMEM.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/DMEM.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module DMEM
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/Decoder.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/Decoder.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module Decoder
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/EX_ME.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/EX_ME.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module EX_ME
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/ID_EX.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/ID_EX.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module ID_EX
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/IF_ID.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/IF_ID.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module IF_ID
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/IMEM.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/IMEM.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module IMEM
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/ME_WB.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/ME_WB.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module ME_WB
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/MUX1.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/MUX1.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module MUX1
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/MUX2.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/MUX2.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module MUX2
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/MUX3.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/MUX3.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module MUX3
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/PC.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/PC.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module PC
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/RG.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/RG.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module RG
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/WHUCPU.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/WHUCPU.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module WHUCPU
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sources_1/new/WHUCPU_soc.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/new/WHUCPU_soc.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module WHUCPU_soc
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/jacksonsang/vivadoProject/whu_cpu/whu_cpu.srcs/sim_1/new/WHUCPU_soc_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.srcs/sim_1/new/WHUCPU_soc_tb.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module WHUCPU_soc_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl

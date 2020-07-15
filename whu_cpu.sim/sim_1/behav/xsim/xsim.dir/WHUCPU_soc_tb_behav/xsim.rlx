@@ -1,11 +1,11 @@
 
 { 
-    crc :  5269831206456047400  , 
+    crc :  10641715171435655100  , 
     ccp_crc :  0  , 
-    cmdline : " -wto fd470f3287c9458d94242a82ee99f1ad --incr --debug typical --relax --mt 8 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip --snapshot WHUCPU_soc_tb_behav xil_defaultlib.WHUCPU_soc_tb xil_defaultlib.glbl" , 
+    cmdline : " -wto fd470f3287c9458d94242a82ee99f1ad --incr --debug typical --relax --mt 2 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot WHUCPU_soc_tb_behav xil_defaultlib.WHUCPU_soc_tb xil_defaultlib.glbl" , 
     buildDate : "Nov  6 2019" , 
-    buildTime : "21:42:20" , 
-    linkCmd : "/usr/bin/gcc -Wa,-W  -O -fPIC  -m64  -Wl,--no-as-needed  -Wl,--unresolved-symbols=ignore-all  -o \"xsim.dir/WHUCPU_soc_tb_behav/xsimk\"   \"xsim.dir/WHUCPU_soc_tb_behav/obj/xsim_0.lnx64.o\" \"xsim.dir/WHUCPU_soc_tb_behav/obj/xsim_1.lnx64.o\" -L\"/home/jacksonsang/xilinx/Vivado/2019.2/lib/lnx64.o\" -lrdi_simulator_kernel   -lrdi_simbridge_kernel" , 
+    buildTime : "21:57:16" , 
+    linkCmd : "D:\\vivado\\2019.2\\addr\\Vivado\\2019.2\\data\\..\\tps\\mingw\\6.2.0\\win64.o\\nt\\bin\\gcc.exe -Wa,-W  -O -Wl,--stack,104857600 -o \"xsim.dir/WHUCPU_soc_tb_behav/xsimk.exe\"   \"xsim.dir/WHUCPU_soc_tb_behav/obj/xsim_0.win64.obj\" \"xsim.dir/WHUCPU_soc_tb_behav/obj/xsim_1.win64.obj\" -L\"D:\\vivado\\2019.2\\addr\\Vivado\\2019.2\\lib\\win64.o\" -lrdi_simulator_kernel   -lrdi_simbridge_kernel" , 
     aggregate_nets : 
     [ 
     ] 

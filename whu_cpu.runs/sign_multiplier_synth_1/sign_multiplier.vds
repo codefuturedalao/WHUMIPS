@@ -1,0 +1,50 @@
+#-----------------------------------------------------------
+# Vivado v2019.2 (64-bit)
+# SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+# IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+# Start of session at: Wed Jul 15 21:31:37 2020
+# Process ID: 12748
+# Current directory: D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.runs/sign_multiplier_synth_1
+# Command line: vivado.exe -log sign_multiplier.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source sign_multiplier.tcl
+# Log file: D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.runs/sign_multiplier_synth_1/sign_multiplier.vds
+# Journal file: D:/225/2020计组MIPS/addr/WHUMIPS/whu_cpu.runs/sign_multiplier_synth_1\vivado.jou
+#-----------------------------------------------------------
+source sign_multiplier.tcl -notrace
+create_project: Time (s): cpu = 00:00:02 ; elapsed = 00:00:05 . Memory (MB): peak = 425.723 ; gain = 111.426
+Command: synth_design -top sign_multiplier -part xc7k70tfbv676-1 -mode out_of_context
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7k70t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7k70t'
+INFO: [Device 21-403] Loading part xc7k70tfbv676-1
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 2716 
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:07 . Memory (MB): peak = 958.902 ; gain = 233.676
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'sign_multiplier' [d:/225/2020MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/i/sign_multiplier/synth/sign_multiplier.vhd:68]
+WARNING: [Synth 8-5640] Port 'zero_detect' is missing in component declaration [d:/225/2020MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/i/sign_multiplier/synth/sign_multiplier.vhd:71]
+WARNING: [Synth 8-5640] Port 'pcasc' is missing in component declaration [d:/225/2020MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/i/sign_multiplier/synth/sign_multiplier.vhd:71]
+	Parameter C_VERBOSITY bound to: 0 - type: integer 
+	Parameter C_MODEL_TYPE bound to: 0 - type: integer 
+	Parameter C_OPTIMIZE_GOAL bound to: 1 - type: integer 
+	Parameter C_XDEVICEFAMILY bound to: kintex7 - type: string 
+	Parameter C_HAS_CE bound to: 0 - type: integer 
+	Parameter C_HAS_SCLR bound to: 0 - type: integer 
+	Parameter C_LATENCY bound to: 1 - type: integer 
+	Parameter C_A_WIDTH bound to: 32 - type: integer 
+	Parameter C_A_TYPE bound to: 0 - type: integer 
+	Parameter C_B_WIDTH bound to: 32 - type: integer 
+	Parameter C_B_TYPE bound to: 0 - type: integer 
+	Parameter C_OUT_HIGH bound to: 63 - type: integer 
+	Parameter C_OUT_LOW bound to: 0 - type: integer 
+	Parameter C_MULT_TYPE bound to: 0 - type: integer 
+	Parameter C_CE_OVERRIDES_SCLR bound to: 0 - type: integer 
+	Parameter C_CCM_IMP bound to: 0 - type: integer 
+	Parameter C_B_VALUE bound to: 10000001 - type: string 
+	Parameter C_HAS_ZERO_DETECT bound to: 0 - type: integer 
+	Parameter C_ROUND_OUTPUT bound to: 0 - type: integer 
+	Parameter C_ROUND_PT bound to: 0 - type: integer 
+INFO: [Synth 8-3491] module 'mult_gen_v12_0_16' declared at 'd:/225/2020MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/i/sign_multiplier/hdl/mult_gen_v12_0_vh_rfs.vhd:21013' bound to instance 'U0' of component 'mult_gen_v12_0_16' [d:/225/2020MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/i/sign_multiplier/synth/sign_multiplier.vhd:120]
+INFO: [Synth 8-256] done synthesizing module 'sign_multiplier' (5#1) [d:/225/2020MIPS/addr/WHUMIPS/whu_cpu.srcs/sources_1/i/sign_multiplier/synth/sign_multiplier.vhd:68]
+WARNING: [Synth 8-3331] design mult_gen_v12_0_16_viv has unconnected port CE
+WARNING: [Synth 8-3331] design mult_gen_v12_0_16_viv has unconnected port SCLR
