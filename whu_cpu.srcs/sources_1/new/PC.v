@@ -34,7 +34,6 @@ module PC(
 	output reg o_ce
     );
 
-	reg status;
 	always
 		@(posedge i_clk) begin
 			if(i_rst == `RST_ENABLE) begin

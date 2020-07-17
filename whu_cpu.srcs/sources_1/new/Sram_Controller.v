@@ -38,56 +38,60 @@ module Sram_Controller(
 		output reg [`INST_ADDR_WIDTH] o_din,
 		output reg o_stall_req,
 		output reg [`INST_WIDTH] o_data,
-		output reg [`INST_ADDR_WIDTH] o_addr
+		output reg [`INST_ADDR_WIDTH] o_addr,
+		output reg o_status
     );
-
-
-	reg status;
-/*
+   
+   
+    //address mapping
+    always
+        @(*) begin
+            if(i_addr >= `KSEG0_START && i_addr < `KSEG1_START) begin
+                  o_addr <= i_addr & 32'h7fff_ffff;
+            end
+            else if(i_addr < `KSEG2_START && i_addr >= `KSEG1_START) begin
+                    o_addr <= i_addr & 32'h5fff_ffff;
+            end
+            else begin
+                    o_addr <= i_addr;
+            end
+        end
+    
 	always
 		@(posedge i_clk) begin
 			if(i_rst == `RST_ENABLE) begin
-				status <= 1'b0;
-			end
-			else if(o_stall_req == `IS_STALL) begin
-				status <= 1'b1;
-			end
-			else if(o_stall_req == `NO_STALL) begin
-				status <= 1'b0;
-			end
-		end
-	*/
-	always
-		@(posedge i_clk) begin
-			if(i_rst == `RST_ENABLE) begin
-				status <= 1'b0;
+				o_status <= 1'b0;
+				o_data <= `ZERO_WORD;
+				o_stall_req <= `NO_STALL;
+				o_en <= `CHIP_DISABLE;
+				o_wen <= 4'b0000;
 			end
 			else if(i_stall == 1'b1) begin
-				status <= 1'b1;
+				o_status <= 1'b1; 		//1 means ready
 			end
 			else if(i_stall == 1'b0) begin
-				status <= 1'b0;
+				o_status <= 1'b0;
 			end
 		end
 
 	always
 		@(*) begin
 			o_data <= `ZERO_WORD;
-			if(i_en == `CHIP_ENABLE && status == 1'b0) begin
+			if(i_en == `CHIP_ENABLE && o_status == 1'b0) begin
 				o_en <= i_en;
 				if((|i_wen) == 1'b1) begin //write
 						o_stall_req <= `NO_STALL;
 						o_wen <= i_wen;
 						o_din <= i_din;
-						o_addr <= i_addr;
+					//	o_addr <= i_addr;
 				end
 				else begin
 						o_stall_req <= `IS_STALL;
-						o_addr <= i_addr;
+					//	o_addr <= i_addr;
 						o_wen <= i_wen;
 				end
 			end
-			else begin
+			else begin   //1 means ready,that we can get our data
 				o_stall_req <= `NO_STALL;
 				o_en <= `CHIP_DISABLE;
 				o_wen <= 4'b0000;

@@ -5,9 +5,15 @@
 `define REG_NUM 31:0
 `define ALUOP_WIDTH 5:0
 `define STALL_WIDTH 5:0
-`define DEFAULT_PC 32'h0000_0000
+`define DEFAULT_PC 32'hbfc0_0000
 `define EXP_DEFAULT_PC 32'hBFC0_0380
 `define WEN_ADDR 3:0
+
+`define KUSEG_START 32'h0000_0000
+`define KSEG0_START 32'h8000_0000
+`define KSEG1_START 32'hA000_0000
+`define KSEG2_START 32'hC000_0000
+`define KSEG3_START 32'hE000_0000
 
 /*control signal*/
 `define RST_ENABLE 1'b0     //low valid
@@ -195,16 +201,6 @@
 `define LUI_ALU_OPCODE 6'b011010
 `define ORI_ALU_OPCODE 6'b011011
 `define XORI_ALU_OPCODE 6'b011100
-//load & store
-`define LB_ALU_OPCODE 6'b010110  //the same as addiu
-`define LBU_ALU_OPCODE 6'b010110 //the same as addiu 
-`define LH_ALU_OPCODE 6'b100111
-`define LHU_ALU_OPCODE 6'b100111 //the same as LH
-`define LW_ALU_OPCODE 6'b101000 
-
-`define SB_ALU_OPCODE 6'b010110  //the same as addiu
-`define SH_ALU_OPCODE 6'b100111 //the same as LH
-`define SW_ALU_OPCODE 6'b101000 //the same as LW
 // J type op
 `define BEQ_ALU_OPCODE 6'b011101
 `define BNE_ALU_OPCODE 6'b011110
@@ -218,6 +214,17 @@
 `define JAL_ALU_OPCODE 6'b100101
 `define JR_ALU_OPCODE 6'b000000
 `define JALR_ALU_OPCODE 6'b100110
+//load & store
+`define LB_ALU_OPCODE 6'b010110  //the same as addiu
+`define LBU_ALU_OPCODE 6'b010110 //the same as addiu 
+`define LH_ALU_OPCODE 6'b100111
+`define LHU_ALU_OPCODE 6'b100111 //the same as LH
+`define LW_ALU_OPCODE 6'b101000 
+
+`define SB_ALU_OPCODE 6'b010110  //the same as addiu
+`define SH_ALU_OPCODE 6'b100111 //the same as LH
+`define SW_ALU_OPCODE 6'b101000 //the same as LW
+
 // HI/LO op
 `define MFHI_ALU_OPCODE 6'b000000
 `define MFLO_ALU_OPCODE 6'b000000
@@ -227,6 +234,6 @@
 `define BREAK_ALU_OPCODE 6'b000000   //the same as nop
 `define SYS_ALU_OPCODE 6'b000000     //the same as nop
 //privileged op
-`define ERET_ALU_OPCODE 6'b100111
-`define MFC0_ALU_OPCODE 6'b101000
-`define MTC0_ALU_OPCODE 6'b101001
+`define ERET_ALU_OPCODE 6'b101001
+`define MFC0_ALU_OPCODE 6'b101010
+`define MTC0_ALU_OPCODE 6'b101011

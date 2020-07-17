@@ -22,21 +22,31 @@
 
 
 module WHUCPU(
-	input wire i_clk,
-	input wire i_rst,
-	input wire [5:0] i_int, 
-	input wire [`REG_WIDTH] i_dmem_data,
-	input wire [`REG_WIDTH] i_imem_data,
-	output wire [`INST_ADDR_WIDTH] o_imem_addr,
-	output wire [`REG_WIDTH] o_imem_data,
-	output wire [3:0] o_imem_wen,
-	output wire o_imem_en,
-	output wire [`REG_WIDTH] o_dmem_addr,
-	output wire [`REG_WIDTH] o_dmem_data,
-	output wire [3:0] o_dmem_wen,
-	output wire o_dmem_en,
-	output wire o_timer_int
+	input wire clk,
+	input wire resetn,
+	input wire [5:0] ext_int, 
+	input wire [`REG_WIDTH] data_sram_rdata,
+	input wire [`REG_WIDTH] inst_sram_rdata,
+	output wire [`INST_ADDR_WIDTH] inst_sram_addr,
+	output wire [`REG_WIDTH] inst_sram_wdata,
+	output wire [3:0] inst_sram_wen,
+	output wire inst_sram_en,
+	output wire [`REG_WIDTH] data_sram_addr,
+	output wire [`REG_WIDTH] data_sram_wdata,
+	output wire [3:0] data_sram_wen,
+	output wire data_sram_en,
+	output wire o_timer_int,
+//for debug
+	output wire [`INST_ADDR_WIDTH] debug_wb_pc,
+	output wire [3:0] debug_wb_rf_wen,
+	output wire [`REG_ADDR_WIDTH] debug_wb_rf_wnum,
+   	output wire [`REG_WIDTH] debug_wb_rf_wdata
+
     );
+	wire i_rst; 
+	assign i_rst = resetn;
+	wire i_clk;
+	assign i_clk = clk;
 	wire [`STALL_WIDTH] stall;
 	wire [`INST_ADDR_WIDTH] branch_pc;
 	wire is_branch;
@@ -54,17 +64,18 @@ module WHUCPU(
 
 
 	wire [`INST_WIDTH] if_inst; 
+	wire inst_sram_status;
+	wire data_sram_status;
 	wire if_sram_stall;
 	wire mem_sram_stall; 
 	Sram_Controller my_imem_controller(
 		.i_clk(i_clk), .i_rst(i_rst), .i_en(imem_ce), .i_din(`ZERO_WORD),
-		.i_addr(if_pc), .i_wen(4'b0000), .i_dout(i_imem_data), .i_stall(if_sram_stall), 
+		.i_addr(if_pc), .i_wen(4'b0000), .i_dout(inst_sram_rdata), .i_stall(if_sram_stall), 
 		
-		.o_en(o_imem_en), .o_wen(o_imem_wen), .o_din(o_imem_data), .o_stall_req(stall_req_from_if),
-		.o_data(if_inst), .o_addr(o_imem_addr)
+		.o_en(inst_sram_en), .o_wen(inst_sram_wen), .o_din(inst_sram_wdata), .o_stall_req(stall_req_from_if),
+		.o_data(if_inst), .o_addr(inst_sram_addr), .o_status(inst_sram_status)
 	);
 
-    assign o_imem_addr = if_pc;
 	wire [`INST_ADDR_WIDTH] id_pc;
 	wire [`INST_WIDTH] id_inst;
 	IF_ID my_if_id(
@@ -148,6 +159,7 @@ module WHUCPU(
 			.i_id_reg1_addr(id_reg1_addr), .i_id_reg2_addr(id_reg2_addr), .i_id_reg1_read(id_reg1_read), .i_id_reg2_read(id_reg2_read),
 			.i_ex_reg3_addr(ex_reg3_addr), .i_ex_reg3_write(ex_reg3_write), .i_ex_result_or_mem(ex_result_or_mem), 
 			.i_mem_reg3_addr(mem_reg3_addr), .i_mem_reg3_write(mem_reg3_write), .i_stall_req_from_if(stall_req_from_if), .i_stall_req_from_mem(stall_req_from_mem),
+			.i_jump_branch(is_branch), .i_inst_sram_status(inst_sram_status),
 
 			.o_stall(stall), .o_if_sram_stall(if_sram_stall), .o_mem_sram_stall(mem_sram_stall), .o_forwardA(forwardA), .o_forwardB(forwardB)
 	);	
@@ -201,7 +213,7 @@ module WHUCPU(
 	wire [`REG_WIDTH] mem_cp0_cause;
 	wire [`REG_WIDTH] mem_cp0_epc;
 	CP0 my_cp0(
-		.i_clk(i_clk), .i_rst(i_rst), .i_int(i_int), .i_ex_rd_addr(ex_rd_addr), .i_ex_cp0_sel(ex_imm16[2:0]), 
+		.i_clk(i_clk), .i_rst(i_rst), .i_int(ext_int), .i_ex_rd_addr(ex_rd_addr), .i_ex_cp0_sel(ex_imm16[2:0]), 
 		.i_wb_cp0_sel(wb_cp0_sel), .i_wb_cp0_data(wb_cp0_data), .i_wb_rd_addr(wb_rd_addr), .i_wb_cp0_write(wb_cp0_write),
 		.i_exp_type(mem_exp_ntype), .i_curr_in_dslot(mem_curr_in_dslot), .i_pc(mem_pc),
 
@@ -256,10 +268,10 @@ module WHUCPU(
 	wire [`REG_WIDTH] dmem_data;
 	Sram_Controller my_dmem_controller(
 		.i_clk(i_clk), .i_rst(i_rst), .i_en(exp_mem_en), .i_din(mem_mem_data), .i_addr(mem_alu_result),
-		.i_wen(mem_mem_wen), .i_dout(i_dmem_data),
+		.i_wen(mem_mem_wen), .i_dout(data_sram_rdata),
 		.i_stall(mem_sram_stall),
-		.o_en(o_dmem_en), .o_wen(o_dmem_wen), .o_din(o_dmem_data), .o_stall_req(stall_req_from_mem),
-		.o_data(dmem_data), .o_addr(o_dmem_addr)
+		.o_en(data_sram_en), .o_wen(data_sram_wen), .o_din(data_sram_wdata), .o_stall_req(stall_req_from_mem),
+		.o_data(dmem_data), .o_addr(data_sram_addr), .o_status(data_sram_status) //this port is useless for now
 		
 	);
 
@@ -278,13 +290,17 @@ module WHUCPU(
 			.o_reg3_data(mem_reg3_data)
 	);
 	
+	assign debug_wb_rf_wen = {4{wb_reg3_write}};
+	assign debug_wb_rf_wnum = wb_reg3_addr;
+	assign debug_wb_rf_wdata = wb_reg3_data;
+	
 	ME_WB my_me_wb(
 			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_mem_reg3_data(mem_reg3_data), .i_mem_reg3_addr(mem_reg3_addr),
 			.i_mem_reg3_write(mem_reg3_write), .i_mem_cp0_write(mem_cp0_write), .i_mem_cp0_sel(mem_cp0_sel), 
-			.i_flush(flush),
+			.i_flush(flush), .i_mem_pc(mem_pc),
 
 			.o_wb_reg3_data(wb_reg3_data), .o_wb_reg3_addr(wb_reg3_addr), .o_wb_reg3_write(wb_reg3_write),
-			.o_wb_cp0_write(wb_cp0_write), .o_wb_cp0_sel(wb_cp0_sel)
+			.o_wb_cp0_write(wb_cp0_write), .o_wb_cp0_sel(wb_cp0_sel), .o_wb_pc(debug_wb_pc)
 	);
 
 endmodule

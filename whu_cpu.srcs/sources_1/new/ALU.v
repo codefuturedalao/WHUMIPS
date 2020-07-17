@@ -36,18 +36,22 @@ module ALU(
 	wire [32:0] sub_result_reg; //
 	wire [32:0] add_result_imm; //the most significant bit can be used for judge overflow
 	wire [32:0] sub_result_imm; //
-	wire [31:0] imm32_sign; 
-	wire [31:0] imm32_unsign; 
+	wire [31:0] imm32_sign;                //could be replace by imm33_sign    do it later
+	wire [31:0] imm32_unsign;              //could be replace by imm33_unsign
+	wire [32:0] imm33_sign; 
+	wire [32:0] imm33_unsign; 
 	reg overflow;
 	reg no_align;
 	assign o_exp_type = {i_exp_type[31:14], overflow, no_align, i_exp_type[11:0]};
 
 	assign imm32_sign = {{16{i_imm16[15]}},i_imm16[15:0]};
 	assign imm32_unsign = {16'b0,i_imm16[15:0]};
+	assign imm33_sign = {{17{i_imm16[15]}},i_imm16[15:0]};
+	assign imm33_unsign = {17'b0,i_imm16[15:0]};
 	assign add_result_reg = {i_reg1_ndata[31],i_reg1_ndata[31:0]} + {i_reg2_ndata[31],i_reg2_ndata[31:0]}; //usr for add,addu
-	assign add_result_imm = {i_reg1_ndata[31],i_reg1_ndata[31:0]} + imm32_sign; //use for addi,addiu
+	assign add_result_imm = {i_reg1_ndata[31],i_reg1_ndata[31:0]} + imm33_sign; //use for addi,addiu
 	assign sub_result_reg = {i_reg1_ndata[31],i_reg1_ndata[31:0]} - {i_reg2_ndata[31],i_reg2_ndata[31:0]}; //use for sub,subu,slt
-	assign sub_result_imm = {i_reg1_ndata[31],i_reg1_ndata[31:0]} - imm32_unsign; //use for slti
+	assign sub_result_imm = {i_reg1_ndata[31],i_reg1_ndata[31:0]} - imm33_sign; //use for slti
 
 	always
 		@(*) begin
@@ -90,10 +94,20 @@ module ALU(
 				`SLT_ALU_OPCODE: begin
 //					if(sub_result_reg[32] == 1'b1)
 //						o_alu_result <= 32'b1;
-					o_alu_result <= sub_result_reg[32];
+                    if(sub_result_reg[32] ^ sub_result_reg[31] != 1'b1) begin
+					    o_alu_result <= sub_result_reg[31];
+					end
+					else begin
+					   o_alu_result <= {{31'b0},~(sub_result_reg[31])};
+					end
 				end
 				`SLTI_ALU_OPCODE: begin
-					o_alu_result <= sub_result_imm[32];
+				    if(sub_result_imm[32] ^ sub_result_imm[31] != 1'b1) begin
+					   o_alu_result <= sub_result_imm[31];
+					end
+					else begin
+					   o_alu_result <= {{31'b0},~(sub_result_imm[31])};
+					end
 				end
 				`SLTU_ALU_OPCODE: begin
 					o_alu_result <= (i_reg1_ndata < i_reg2_ndata) ? 32'b1 : 32'b0;
