@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module my_multdiv(
+module MULTDIV(
 	input wire i_clk,
 	input wire [`REG_WIDTH] i_reg1_ndata,
 	input wire [`REG_WIDTH] i_reg2_ndata,

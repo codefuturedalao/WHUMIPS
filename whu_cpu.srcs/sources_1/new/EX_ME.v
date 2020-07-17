@@ -26,6 +26,8 @@ module EX_ME(
 	input wire i_rst,
 	input wire [`STALL_WIDTH] i_stall,
 	input wire [`REG_WIDTH] i_ex_alu_result,
+	input wire [`REG_WIDTH] i_ex_hi_result,
+	input wire [`REG_WIDTH] i_ex_lo_result,
 	input wire [`REG_WIDTH] i_ex_reg2_ndata,
 	input wire [`REG_ADDR_WIDTH] i_ex_reg3_addr,
 	input wire [3:0] i_ex_mem_wen,
@@ -37,6 +39,8 @@ module EX_ME(
 	input wire [2:0] i_ex_cp0_sel,
 	
 	output reg [`REG_WIDTH] o_mem_alu_result,
+	output reg [`REG_WIDTH] o_mem_hi_result,
+	output reg [`REG_WIDTH] o_mem_lo_result,
 	output reg [`REG_WIDTH] o_mem_reg2_ndata,
 	output reg [`REG_ADDR_WIDTH] o_mem_reg3_addr,
 	output reg [3:0] o_mem_mem_wen,
@@ -51,6 +55,8 @@ module EX_ME(
 		@(posedge i_clk) begin
 				if(i_rst == `RST_ENABLE) begin
 						o_mem_alu_result <= `ZERO_WORD;
+						o_mem_hi_result <= `ZERO_WORD;
+						o_mem_lo_result <= `ZERO_WORD;						
 						o_mem_reg2_ndata <= `ZERO_WORD;
 						o_mem_reg3_addr <= 5'b00000;
 						o_mem_mem_wen <= 4'b0000;
@@ -63,6 +69,8 @@ module EX_ME(
 				end
 				else if(i_stall[2] == 1'b1 && i_stall[1] == 0) begin
 						o_mem_alu_result <= `ZERO_WORD;
+						o_mem_hi_result <= `ZERO_WORD;
+						o_mem_lo_result <= `ZERO_WORD;
 						o_mem_reg2_ndata <= `ZERO_WORD;
 						o_mem_reg3_addr <= 5'b00000;
 						o_mem_mem_wen <= 4'b0000;
@@ -78,6 +86,8 @@ module EX_ME(
 				end
 				else begin
 						o_mem_alu_result <= i_ex_alu_result;
+						o_mem_hi_result <= i_ex_hi_result;
+						o_mem_lo_result <= i_ex_lo_result;
 						o_mem_reg2_ndata <= i_ex_reg2_ndata;
 						o_mem_reg3_addr <= i_ex_reg3_addr;
 						o_mem_mem_wen <= i_ex_mem_wen;

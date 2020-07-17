@@ -193,17 +193,29 @@ module WHUCPU(
 
 			.o_exception_flag(exception_flag), .o_alu_result(ex_alu_result)
 	);
+	
+	wire [`REG_WIDTH]ex_hi_result;
+	wire [`REG_WIDTH]ex_lo_result;
+	MULTDIV my_multdiv(
+	.i_clk(i_clk),
+	.i_reg1_ndata(ex_reg1_data),
+	.i_reg2_ndata(ex_reg2_data),
+	.i_aluop(ex_aluop),
+	.o_hi_result(ex_hi_result),
+	.o_lo_result(ex_lo_result));
 
 	wire [2:0] mem_mem_byte_se;
 	wire mem_result_or_mem;
+	wire [`REG_WIDTH]mem_hi_result;
+	wire [`REG_WIDTH]mem_hi_result;
 	assign o_dmem_addr = mem_alu_result;
 	EX_ME my_ex_me(
-			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_ex_alu_result(ex_alu_result), .i_ex_reg2_ndata(ex_reg2_data),
+			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_ex_alu_result(ex_alu_result), .i_ex_hi_result(ex_hi_result),.i_ex_lo_result(ex_lo_result),.i_ex_reg2_ndata(ex_reg2_data),
 			.i_ex_reg3_addr(ex_reg3_addr), .i_ex_mem_wen(ex_mem_wen), .i_ex_mem_en(ex_mem_en), .i_ex_mem_byte_se(ex_mem_byte_se),
 			.i_ex_result_or_mem(ex_result_or_mem), .i_ex_reg3_write(ex_reg3_write),
 			.i_ex_cp0_write(ex_cp0_write) ,.i_ex_cp0_sel(ex_imm16[2:0]),
 
-			.o_mem_alu_result(mem_alu_result), .o_mem_reg2_ndata(o_dmem_data), .o_mem_reg3_addr(mem_reg3_addr), .o_mem_mem_wen(o_dmem_wen),
+			.o_mem_alu_result(mem_alu_result),.o_mem_hi_result(mem_hi_result),.o_mem_lo_result(mem_lo_result), .o_mem_reg2_ndata(o_dmem_data), .o_mem_reg3_addr(mem_reg3_addr), .o_mem_mem_wen(o_dmem_wen),
 			.o_mem_mem_en(o_dmem_en), .o_mem_mem_byte_se(mem_mem_byte_se), .o_mem_result_or_mem(mem_result_or_mem), .o_mem_reg3_write(mem_reg3_write),
 			.o_mem_cp0_write(mem_cp0_write), .o_mem_cp0_sel(mem_cp0_sel)
 	);
