@@ -34,11 +34,10 @@ module Ctrl(
 	input wire i_stall_req_from_if,
 	input wire i_stall_req_from_mem,
 	input wire i_jump_branch,
-	input wire i_inst_sram_status,
+	input wire i_if_read_result_flag,
 	
 	output reg [`STALL_WIDTH] o_stall,
-	output reg o_if_sram_stall,
-	output reg o_mem_sram_stall,
+	output reg o_if_axi_stall,
 	output reg [1:0] o_forwardA,
 	output reg [1:0] o_forwardB
     );
@@ -73,23 +72,22 @@ module Ctrl(
 	always
 		@(*) begin
 				o_stall <= 6'b000000;
-				o_if_sram_stall <= `NO_STALL;
-				o_mem_sram_stall <= `NO_STALL;
+				o_if_axi_stall <= `NO_STALL;
 				if(i_stall_req_from_mem == `IS_STALL) begin
 						o_stall <= 6'b111110;
-						o_mem_sram_stall <= `IS_STALL;
+						o_if_axi_stall <= `IS_STALL;
 				end
 				else if(i_ex_result_or_mem == `REG3_FROM_MEM && i_ex_reg3_write == `REG3_WRITE && (i_id_reg1_addr == i_ex_reg3_addr && i_id_reg1_read == `REG_READ || i_id_reg2_addr == i_ex_reg3_addr && i_id_reg2_read == `REG_READ)) begin//load inst
 						o_stall <= 6'b111000;
-						o_if_sram_stall <= `IS_STALL;
+						o_if_axi_stall <= `IS_STALL;
 				end
-				else if(i_jump_branch == 1'b1 && i_inst_sram_status == 1'b0) begin
+				else if(i_jump_branch == 1'b1 && i_if_read_result_flag == 1'b0) begin
 						o_stall <= 6'b111000;
-						o_if_sram_stall <= `IS_STALL;
+						o_if_axi_stall <= `IS_STALL;
 				end
 				else if(i_stall_req_from_if == `IS_STALL) begin
 						o_stall <= 6'b110000;
-						o_if_sram_stall <= `IS_STALL;
+						o_if_axi_stall <= `IS_STALL;
 				end
 		end	
 endmodule
