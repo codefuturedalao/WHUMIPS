@@ -25,7 +25,6 @@ module BranchControl(
 	input wire i_jump,
 	input wire i_jump_src,
 	input wire i_branch,
-	input wire i_curr_in_dslot,
 	input wire [`INST_ADDR_WIDTH] i_pc,
 	input wire [25:0] i_imm26,
 	input wire [`REG_WIDTH] i_reg1_ndata,
@@ -33,12 +32,10 @@ module BranchControl(
 	input wire [`ALUOP_WIDTH] i_aluop, 
 	output wire o_jump_branch,
 	output reg [`INST_ADDR_WIDTH] o_jump_branch_pc,
-	output wire o_curr_in_dslot,
 	output reg o_next_in_dslot
     );
 	reg branch_flag;
 	assign o_jump_branch = (branch_flag & i_branch) | i_jump;
-	assign o_curr_in_dslot = i_curr_in_dslot;
 	always
 		@(i_jump, i_jump_src, i_branch, i_pc, i_imm26, i_reg1_ndata, i_reg2_ndata, i_aluop, branch_flag) begin
 			if(i_jump == `IS_JUMP) begin
@@ -103,7 +100,7 @@ module BranchControl(
 
 	always
 		@(*) begin
-				if(o_jump_branch == 1'b1) begin
+				if((i_branch | i_jump) == 1'b1) begin
 						o_next_in_dslot <= `IN_DSLOT;
 				end	
 				else begin

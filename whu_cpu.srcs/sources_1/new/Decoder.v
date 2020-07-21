@@ -23,7 +23,8 @@
 
 
 module Decoder(
-    input [`INST_WIDTH] i_inst,  
+    input wire [`INST_WIDTH] i_inst,  
+	input wire [31:0] i_exp_type,
 
     output reg o_reg1_read,
 	output reg o_reg2_read,
@@ -42,7 +43,8 @@ module Decoder(
 	output reg o_result_or_mem,
 	output reg o_reg3_write,
 	output reg o_cp0_write,
-	output wire [31:0] o_exp_type
+	output wire [31:0] o_exp_type,
+	output reg o_hilo_write
     );
 	
 	reg syscall;
@@ -54,7 +56,7 @@ module Decoder(
 	assign o_reg2_addr = i_inst[20:16];
 	assign o_rd_addr = i_inst[15:11];
 	assign o_imm26 = i_inst[25:0];
-	assign o_exp_type = {20'b0, syscall, eret, break, inst_valid, 8'b0};
+	assign o_exp_type = {i_exp_type[31:12], syscall, eret, break, inst_valid, i_exp_type[7:0]};
 	wire [5:0] opcode = i_inst[31:26];	
 	wire [5:0] imm5_0 = i_inst[5:0];
 	wire [4:0] imm20_16 = i_inst[20:16]; //the same as reg2_addr
@@ -75,6 +77,7 @@ module Decoder(
             o_branch <= `NO_BRANCH;
             o_result_or_mem <= `REG3_FROM_RESULT;
             o_reg3_write <= `REG3_WRITE;
+			o_hilo_write <= `HILO_NO_WRITE;
 			case(opcode)
 				`ADDI_OPCODE: begin
 					o_aluop <= `ADDI_ALU_OPCODE;
@@ -154,18 +157,26 @@ module Decoder(
 						`DIV_OPCODE: begin
 							o_aluop <= `DIV_ALU_OPCODE;
 							inst_valid <= `INST_VALID;
+							o_hilo_write <= `HILO_WRITE;
+							o_reg3_write <= `REG3_NO_WRITE;
 						end	 
 						`DIVU_OPCODE: begin
 							o_aluop <= `DIVU_ALU_OPCODE;
 							inst_valid <= `INST_VALID;
+							o_hilo_write <= `HILO_WRITE;
+							o_reg3_write <= `REG3_NO_WRITE;
 						end	 
 						`MULT_OPCODE: begin
 							o_aluop <= `MULT_ALU_OPCODE;
 							inst_valid <= `INST_VALID;
+							o_hilo_write <= `HILO_WRITE;
+							o_reg3_write <= `REG3_NO_WRITE;
 						end	 
 						`MULTU_OPCODE: begin
 							o_aluop <= `MULTU_ALU_OPCODE;
 							inst_valid <= `INST_VALID;
+							o_hilo_write <= `HILO_WRITE;
+							o_reg3_write <= `REG3_NO_WRITE;
 						end	 
 						`AND_OPCODE: begin
 							o_aluop <= `AND_ALU_OPCODE;
@@ -209,6 +220,32 @@ module Decoder(
 							o_aluop <= `SRL_ALU_OPCODE;
 							o_reg1_read <= `REG_NO_READ;
 							inst_valid <= `INST_VALID;
+						end
+						`MFHI_OPCODE: begin
+							o_aluop <= `MFHI_ALU_OPCODE;
+							o_reg1_read <= `REG_NO_READ;
+							o_reg2_read <= `REG_NO_READ;
+							inst_valid <= `INST_VALID;
+						end
+						`MFLO_OPCODE: begin
+							o_aluop <= `MFLO_ALU_OPCODE;
+							o_reg1_read <= `REG_NO_READ;
+							o_reg2_read <= `REG_NO_READ;
+							inst_valid <= `INST_VALID;
+						end
+						`MTHI_OPCODE: begin
+							o_aluop <= `MTHI_ALU_OPCODE;
+							o_reg2_read <= `REG_NO_READ;
+							o_reg3_write <= `REG3_NO_WRITE;
+							inst_valid <= `INST_VALID;
+							o_hilo_write <= `HILO_WRITE;
+						end
+						`MTLO_OPCODE: begin
+							o_aluop <= `MTLO_ALU_OPCODE;
+							o_reg2_read <= `REG_NO_READ;
+							o_reg3_write <= `REG3_NO_WRITE;
+							inst_valid <= `INST_VALID;
+							o_hilo_write <= `HILO_WRITE;
 						end
 						/*trap inst*/
 						`BREAK_OPCODE: begin

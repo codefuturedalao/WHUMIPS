@@ -35,6 +35,7 @@ module CP0(
 	input wire [31:0] i_exp_type,
 	input wire i_curr_in_dslot,
 	input wire [`INST_ADDR_WIDTH] i_pc,
+	input wire [`REG_WIDTH] i_bad_addr,
 
 	output reg [`REG_WIDTH] o_ex_cp0_data,
 	output reg o_timer_int,
@@ -46,6 +47,7 @@ module CP0(
 	
 	reg [`REG_WIDTH] count;
 	reg [`REG_WIDTH] compare;
+	reg [`REG_WIDTH] badVAddr;
 //	reg [`REG_WIDTH] status;
 //	reg [`REG_WIDTH] cause;
 //	reg [`REG_WIDTH] epc;
@@ -63,6 +65,7 @@ module CP0(
 				o_epc <= `ZERO_WORD;
 				conf <= 32'b0000_0000_0000_0000_10000_0000_0000_0000; //little endian
 				prid <= 32'b0000_0000_0100_1100_0000_0001_0000_0010;
+				badVAddr <= 32'h0000_0000;
 				o_timer_int <= `INT_NO_ASSERTION;
 			end
 			else begin
@@ -167,7 +170,7 @@ module CP0(
 								o_status[`STATUS_EXL] <= 1'b1;
 								o_cause[`CAUSE_EXCCODE] <= `OV_EXC;
 						end
-						`ALIGN_EXP_TYPE: begin
+						`ALIGN_ME_WRITE_EXP_TYPE: begin
 								if(o_status[`STATUS_EXL] == 1'b0) begin
 										if(i_curr_in_dslot == `IN_DSLOT) begin
 												o_epc <= i_pc - 4;
@@ -180,6 +183,37 @@ module CP0(
 								end
 								o_status[`STATUS_EXL] <= 1'b1;
 								o_cause[`CAUSE_EXCCODE] <= `ADES_EXC;
+								badVAddr <= i_bad_addr;
+						end
+						`ALIGN_ME_READ_EXP_TYPE: begin
+								if(o_status[`STATUS_EXL] == 1'b0) begin
+										if(i_curr_in_dslot == `IN_DSLOT) begin
+												o_epc <= i_pc - 4;
+												o_cause[`CAUSE_BD] <= 1'b1;
+										end
+										else begin
+												o_epc <= i_pc;
+												o_cause[`CAUSE_BD] <= 1'b0;
+										end
+								end
+								o_status[`STATUS_EXL] <= 1'b1;
+								o_cause[`CAUSE_EXCCODE] <= `ADEL_EXC;
+								badVAddr <= i_bad_addr;
+						end
+						`ALIGN_IF_READ_EXP_TYPE: begin
+								if(o_status[`STATUS_EXL] == 1'b0) begin
+										if(i_curr_in_dslot == `IN_DSLOT) begin
+												o_epc <= i_pc - 4;
+												o_cause[`CAUSE_BD] <= 1'b1;
+										end
+										else begin
+												o_epc <= i_bad_addr;
+												o_cause[`CAUSE_BD] <= 1'b0;
+										end
+								end
+								o_status[`STATUS_EXL] <= 1'b1;
+								o_cause[`CAUSE_EXCCODE] <= `ADEL_EXC;
+								badVAddr <= i_bad_addr;
 						end
 				endcase
 			end
@@ -213,6 +247,9 @@ module CP0(
 								end
 								`CP0_REG_CONFIG: begin
 									o_ex_cp0_data <= conf;
+								end
+								`CP0_REG_BADVADDR: begin
+									o_ex_cp0_data <= badVAddr;
 								end
 								default: begin
 									o_ex_cp0_data <= `ZERO_WORD;

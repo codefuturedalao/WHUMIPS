@@ -36,16 +36,56 @@ module MUX2(
 				else begin
 					case(i_mem_byte_se)
 							`MEM_SE_BYTE: begin
-									o_reg3_data <= {{24{i_mem_data[7]}},i_mem_data[7:0]};
+									case(i_alu_result[1:0]) 
+											2'b00: begin
+													o_reg3_data <= {{24{i_mem_data[7]}},i_mem_data[7:0]};
+											end
+											2'b01: begin
+													o_reg3_data <= {{24{i_mem_data[15]}},i_mem_data[15:8]};
+											end
+											2'b10: begin
+													o_reg3_data <= {{24{i_mem_data[23]}},i_mem_data[23:16]};
+											end
+											2'b11: begin
+													o_reg3_data <= {{24{i_mem_data[31]}},i_mem_data[31:24]};
+											end
+									endcase
 							end
 							`MEM_SE_BYTE_U: begin
-									o_reg3_data <= {{24'b0},i_mem_data[7:0]};
+									case(i_alu_result[1:0]) 
+											2'b00: begin
+													o_reg3_data <= {{24'b0},i_mem_data[7:0]};
+											end
+											2'b01: begin
+													o_reg3_data <= {{24'b0},i_mem_data[15:8]};
+											end
+											2'b10: begin
+													o_reg3_data <= {{24'b0},i_mem_data[23:16]};
+											end
+											2'b11: begin
+													o_reg3_data <= {{24'b0},i_mem_data[31:24]};
+											end
+									endcase
 							end
 							`MEM_SE_HALF: begin
-									o_reg3_data <= {{16{i_mem_data[15]}},i_mem_data[15:0]};
+									case(i_alu_result[1:0]) 
+											2'b00: begin
+													o_reg3_data <= {{16{i_mem_data[15]}},i_mem_data[15:0]};
+											end
+											2'b10: begin
+													o_reg3_data <= {{16{i_mem_data[31]}},i_mem_data[31:16]};
+											end
+									endcase
 							end
 							`MEM_SE_HALF_U: begin
-									o_reg3_data <= {{16'b0},i_mem_data[15:0]};
+									case(i_alu_result[1:0]) 
+											2'b00: begin
+													o_reg3_data <= {{16'b0},i_mem_data[15:0]};
+											end
+											2'b10: begin
+													o_reg3_data <= {{16'b0},i_mem_data[31:16]};
+											end
+									endcase
 							end
 							`MEM_SE_WORD: begin
 									o_reg3_data <= i_mem_data;
