@@ -49,6 +49,8 @@
 `define CHIP_DISABLE 1'b0
 `define IS_STALL 1'b1
 `define NO_STALL 1'b0
+`define HILO_WRITE 1'b1
+`define HILO_NO_WRITE 1'b0
 //make no valid is 1
 `define INST_VALID 1'b0
 `define INST_NO_VALID 1'b1
@@ -56,6 +58,7 @@
 `define NOT_IN_DSLOT 1'b0
 
 /* CP0 Register */
+`define CP0_REG_BADVADDR 5'b01000
 `define CP0_REG_COUNT 5'b01001
 `define CP0_REG_COMPARE 5'b01011
 `define CP0_REG_STATUS 5'b01100
@@ -88,7 +91,10 @@
 `define ERET_EXP_TYPE 32'h0000_0004
 `define BREAK_EXP_TYPE 32'h0000_0005
 `define OV_EXP_TYPE 32'h0000_0006
-`define ALIGN_EXP_TYPE 32'h0000_0007
+`define ALIGN_ME_READ_EXP_TYPE 32'h0000_0007
+`define ALIGN_ME_WRITE_EXP_TYPE 32'h0000_0008
+`define ALIGN_IF_READ_EXP_TYPE 32'h0000_0009
+
 
 //
 `define ZERO_WORD 32'b0000_0000_0000_0000_0000_0000_0000_0000
@@ -226,10 +232,10 @@
 `define SW_ALU_OPCODE 6'b101000 //the same as LW
 
 // HI/LO op
-`define MFHI_ALU_OPCODE 6'b000000
-`define MFLO_ALU_OPCODE 6'b000000
-`define MTHI_ALU_OPCODE 6'b000000
-`define MTLO_ALU_OPCODE 6'b000000
+`define MFHI_ALU_OPCODE 6'b101100
+`define MFLO_ALU_OPCODE 6'b101101
+`define MTHI_ALU_OPCODE 6'b101110
+`define MTLO_ALU_OPCODE 6'b101111
 // trap
 `define BREAK_ALU_OPCODE 6'b000000   //the same as nop
 `define SYS_ALU_OPCODE 6'b000000     //the same as nop

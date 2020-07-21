@@ -42,6 +42,8 @@ module ID_EX(
 	input wire [31:0] i_id_exp_type,
 	input wire i_id_next_in_dslot,
 	input wire i_id_curr_in_dslot,
+	input wire i_id_hilo_wen,
+	input wire [`INST_ADDR_WIDTH] i_id_bad_pc,
 
 	output reg [`REG_WIDTH] o_ex_reg1_data,
 	output reg [`REG_WIDTH] o_ex_reg2_data,
@@ -58,7 +60,10 @@ module ID_EX(
 	output reg [`REG_ADDR_WIDTH] o_ex_rd_addr,
 	output reg [31:0] o_ex_exp_type,
 	output reg o_ex_next_in_dslot,
-	output reg o_ex_curr_in_dslot
+	output reg o_ex_curr_in_dslot,
+	output reg o_ex_hilo_wen,
+	output reg [`INST_ADDR_WIDTH] o_ex_bad_pc
+
     );
 	always
 		@(posedge i_clk) begin
@@ -79,6 +84,8 @@ module ID_EX(
 				o_ex_exp_type <= `ZERO_WORD;
 				o_ex_next_in_dslot <= `NOT_IN_DSLOT;
 				o_ex_curr_in_dslot <= `NOT_IN_DSLOT;
+				o_ex_hilo_wen <= `HILO_NO_WRITE;
+				o_ex_bad_pc <= `ZERO_WORD;
 			end
 			else if(i_flush == `IS_FLUSH || (i_stall[3] == 1'b1 && i_stall[2] == 1'b0)) begin
 				o_ex_reg1_data <= `ZERO_WORD;
@@ -97,6 +104,8 @@ module ID_EX(
 				o_ex_exp_type <= `ZERO_WORD;
 				o_ex_next_in_dslot <= `NOT_IN_DSLOT;
 				o_ex_curr_in_dslot <= `NOT_IN_DSLOT;
+				o_ex_hilo_wen <= `HILO_NO_WRITE;
+				o_ex_bad_pc <= `ZERO_WORD;
 			end 
 			else if(i_stall[3] == 1'b1 && i_stall[2] == 1'b1) begin
 				//keep the original value
@@ -118,6 +127,8 @@ module ID_EX(
 				o_ex_exp_type <= i_id_exp_type;
 				o_ex_next_in_dslot <= i_id_next_in_dslot;
 				o_ex_curr_in_dslot <= i_id_curr_in_dslot;
+				o_ex_hilo_wen <= i_id_hilo_wen;
+				o_ex_bad_pc <= i_id_bad_pc;
 			end
 		end
 endmodule

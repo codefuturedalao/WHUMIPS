@@ -32,6 +32,7 @@ module Sram_Controller(
 		//
 		input wire [`INST_WIDTH] i_dout,
 		input wire i_stall,
+		input wire i_flush,
 		//
 		output reg o_en,
 		output reg [`WEN_ADDR] o_wen,
@@ -60,11 +61,6 @@ module Sram_Controller(
 	always
 		@(posedge i_clk) begin
 			if(i_rst == `RST_ENABLE) begin
-				o_status <= 1'b0;
-				o_data <= `ZERO_WORD;
-				o_stall_req <= `NO_STALL;
-				o_en <= `CHIP_DISABLE;
-				o_wen <= 4'b0000;
 			end
 			else if(i_stall == 1'b1) begin
 				o_status <= 1'b1; 		//1 means ready
@@ -77,7 +73,14 @@ module Sram_Controller(
 	always
 		@(*) begin
 			o_data <= `ZERO_WORD;
-			if(i_en == `CHIP_ENABLE && o_status == 1'b0) begin
+			if(i_rst == `RST_ENABLE || i_flush == `IS_FLUSH) begin
+			    o_en <= `CHIP_DISABLE;
+			    o_status <= 1'b0;
+				o_data <= `ZERO_WORD;
+				o_stall_req <= `NO_STALL;
+				o_wen <= 4'b0000;
+			end
+			else if(i_en == `CHIP_ENABLE && o_status == 1'b0) begin
 				o_en <= i_en;
 				if((|i_wen) == 1'b1) begin //write
 						o_stall_req <= `NO_STALL;

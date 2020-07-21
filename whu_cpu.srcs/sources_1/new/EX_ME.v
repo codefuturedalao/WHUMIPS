@@ -39,6 +39,10 @@ module EX_ME(
 	input wire i_ex_curr_in_dslot,
 	input wire [31:0] i_ex_exp_type,
 	input wire [`INST_ADDR_WIDTH] i_ex_pc,
+	input wire i_ex_hilo_wen,
+	input wire [`REG_WIDTH] i_ex_hi,
+	input wire [`REG_WIDTH] i_ex_lo,
+	input wire [`INST_ADDR_WIDTH] i_ex_bad_pc,
 	
 	output reg [`REG_WIDTH] o_mem_alu_result,
 	output reg [`REG_WIDTH] o_mem_reg2_ndata,
@@ -52,7 +56,11 @@ module EX_ME(
 	output reg [2:0] o_mem_cp0_sel,
 	output reg [31:0] o_mem_exp_type,
 	output reg [`INST_ADDR_WIDTH] o_mem_pc,
-	output reg o_mem_curr_in_dslot
+	output reg o_mem_curr_in_dslot,
+	output reg o_mem_hilo_wen,
+	output reg [`REG_WIDTH] o_mem_hi,
+	output reg [`REG_WIDTH] o_mem_lo,
+	output reg [`INST_ADDR_WIDTH] o_mem_bad_pc
     );
 	always
 		@(posedge i_clk) begin
@@ -70,6 +78,10 @@ module EX_ME(
 						o_mem_pc <= `ZERO_WORD;
 						o_mem_exp_type <= `ZERO_WORD;
 						o_mem_curr_in_dslot <= `NOT_IN_DSLOT;
+						o_mem_hilo_wen <= `HILO_NO_WRITE;
+						o_mem_hi <= `ZERO_WORD;
+						o_mem_lo <= `ZERO_WORD;
+						o_mem_bad_pc <= `ZERO_WORD;
 				end
 				else if(i_flush == `IS_FLUSH || i_stall[2] == 1'b1 && i_stall[1] == 0) begin
 						o_mem_alu_result <= `ZERO_WORD;
@@ -85,6 +97,10 @@ module EX_ME(
 						o_mem_pc <= `ZERO_WORD;
 						o_mem_exp_type <= `ZERO_WORD;
 						o_mem_curr_in_dslot <= `NOT_IN_DSLOT;
+						o_mem_hilo_wen <= `HILO_NO_WRITE;
+						o_mem_hi <= `ZERO_WORD;
+						o_mem_lo <= `ZERO_WORD;
+						o_mem_bad_pc <= `ZERO_WORD;
 				end
 				else if(i_stall[2] == 1'b1 && i_stall[1] == 1) begin
 						//do nothing, just keep the original value
@@ -103,6 +119,10 @@ module EX_ME(
 						o_mem_pc <= i_ex_pc; 
 						o_mem_exp_type <= i_ex_exp_type; 
 						o_mem_curr_in_dslot <= i_ex_curr_in_dslot;
+						o_mem_hilo_wen <= i_ex_hilo_wen;
+						o_mem_hi <= i_ex_hi;
+						o_mem_lo <= i_ex_lo;
+						o_mem_bad_pc <= i_ex_bad_pc;
 				end
 		end
 endmodule
