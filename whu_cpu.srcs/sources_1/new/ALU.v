@@ -119,11 +119,11 @@ module ALU(
 				s_axis_dividend_tvalid <= 1'b0;
 				s_axis_dividend_tdata <= `ZERO_WORD;
 			end
-			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status != 3'b111) begin
+			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status != 3'b101) begin
 				div_status <= div_status + 1'b1;
 				div_done <= 1'b0;
 			end
-			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status == 3'b111) begin
+			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status == 3'b101) begin
 				div_status <= 3'b000; 
 				div_done <= 1'b1;
 			end

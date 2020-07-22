@@ -103,17 +103,18 @@ module WHUCPU(
 	wire [`REG_WIDTH] if_inst;
 	wire exp_mem_en;
 	wire [`REG_WIDTH] mem_alu_result;
-	wire mem_mem_en;
 	wire [3:0] mem_mem_wen;
 	wire [`REG_WIDTH] mem_mem_data;
 	wire [`REG_WIDTH] dmem_data;
 	wire stall_req_from_mem;
 	wire if_read_result_flag;
 	wire if_axi_stall;
+	wire [`WEN_ADDR] mem_n_wen;
+	wire [`REG_WIDTH] mem_n_mem_data;
 	Axi_Controller my_axi_controller(
 		.i_aclk(i_clk), .i_aresetn(i_rst), .i_flush(flush), .i_if_addr(if_pc), .i_if_en(1'b1), .i_if_data(`ZERO_WORD), .i_if_axi_stall(if_axi_stall), .i_ce(imem_ce),
-		.o_if_data(if_inst), .i_mem_addr(mem_alu_result), .i_mem_en(exp_mem_en), .i_mem_wen(mem_mem_wen), 
-		.i_mem_data(mem_mem_data), .o_mem_data(dmem_data), 
+		.o_if_data(if_inst), .i_mem_addr(mem_alu_result), .i_mem_en(exp_mem_en), .i_mem_wen(mem_n_wen), 
+		.i_mem_data(mem_n_mem_data), .o_mem_data(dmem_data), 
 		.o_arid(arid), .o_araddr(araddr), .o_arsize(arsize), .o_arburst(arburst), .o_arlock(arlock), 
 		.o_arcache(arcache), .o_arprot(arprot), .o_arvalid(arvalid), .i_arready(arready),
 		.i_rid(rid), .i_rdata(rdata), .i_rresp(rresp), .i_rlast(rlast), .i_rvalid(rvalid), .o_rready(rready),
@@ -205,7 +206,6 @@ module WHUCPU(
 	wire ex_result_or_mem;
 	wire [`REG_ADDR_WIDTH] mem_reg3_addr;
 	wire mem_reg3_write;
-	wire stall_req_from_mem;
 	wire stall_req_from_ex;
 	Ctrl my_ctrl(
 			.i_id_reg1_addr(id_reg1_addr), .i_id_reg2_addr(id_reg2_addr), .i_id_reg1_read(id_reg1_read), .i_id_reg2_read(id_reg2_read),
@@ -331,9 +331,7 @@ module WHUCPU(
 	wire [2:0] mem_mem_byte_se;
 	wire mem_result_or_mem;
 	wire [31:0] mem_exp_type;
-	wire [3:0] mem_mem_wen;
 	wire mem_mem_en;
-	wire [`REG_WIDTH] mem_mem_data;
 	wire [`INST_ADDR_WIDTH] mem_bad_pc;
 	EX_ME my_ex_me(
 			.i_clk(i_clk), .i_rst(i_rst), .i_stall(stall), .i_ex_alu_result(ex_alu_result), .i_ex_reg2_ndata(ex_reg2_data),
@@ -351,8 +349,6 @@ module WHUCPU(
 			.o_mem_hilo_wen(mem_hilo_wen), .o_mem_hi(mem_hi), .o_mem_lo(mem_lo), .o_mem_bad_pc(mem_bad_pc)
 	);
 
-	wire [`WEN_ADDR] mem_n_wen;
-	wire [`REG_WIDTH] mem_n_mem_data;
 	Memwen_Transform my_mem_wen_tran(
 		.i_alu_result(mem_alu_result), .i_mem_wen(mem_mem_wen), .i_reg2_data(mem_mem_data),
 
