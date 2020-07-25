@@ -49,6 +49,9 @@ module MUX2(
 											2'b11: begin
 													o_reg3_data <= {{24{i_mem_data[31]}},i_mem_data[31:24]};
 											end
+											default: begin
+											         o_reg3_data <= `ZERO_WORD;
+											end
 									endcase
 							end
 							`MEM_SE_BYTE_U: begin
@@ -65,6 +68,9 @@ module MUX2(
 											2'b11: begin
 													o_reg3_data <= {{24'b0},i_mem_data[31:24]};
 											end
+											default: begin
+											         o_reg3_data <= `ZERO_WORD;
+											end
 									endcase
 							end
 							`MEM_SE_HALF: begin
@@ -74,6 +80,9 @@ module MUX2(
 											end
 											2'b10: begin
 													o_reg3_data <= {{16{i_mem_data[31]}},i_mem_data[31:16]};
+											end
+											default: begin
+											         o_reg3_data <= `ZERO_WORD;
 											end
 									endcase
 							end
@@ -85,10 +94,16 @@ module MUX2(
 											2'b10: begin
 													o_reg3_data <= {{16'b0},i_mem_data[31:16]};
 											end
+											default: begin
+											         o_reg3_data <= `ZERO_WORD;
+											end
 									endcase
 							end
 							`MEM_SE_WORD: begin
 									o_reg3_data <= i_mem_data;
+							end
+							default: begin
+									o_reg3_data <= `ZERO_WORD;
 							end
 					endcase
 				end

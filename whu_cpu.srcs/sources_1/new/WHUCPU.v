@@ -22,8 +22,8 @@
 
 
 module WHUCPU(
-	input wire aclk,
-	input wire aresetn,
+(*mark_debug = "true"*)	input wire aclk,
+(*mark_debug = "true"*)	input wire aresetn,
 	input wire [5:0] ext_int, 
 	output wire [3:0] arid, 	//0 : fetch inst  1 : fetch data
 	output wire [31:0] araddr,
@@ -68,10 +68,10 @@ module WHUCPU(
 
 	output wire o_timer_int,
 //for debug
-	output wire [`INST_ADDR_WIDTH] debug_wb_pc,
-	output wire [3:0] debug_wb_rf_wen,
-	output wire [`REG_ADDR_WIDTH] debug_wb_rf_wnum,
-   	output wire [`REG_WIDTH] debug_wb_rf_wdata
+(*mark_debug = "true"*)	output wire [`INST_ADDR_WIDTH] debug_wb_pc,
+(*mark_debug = "true"*)	output wire [3:0] debug_wb_rf_wen,
+(*mark_debug = "true"*)	output wire [`REG_ADDR_WIDTH] debug_wb_rf_wnum,
+(*mark_debug = "true"*) output wire [`REG_WIDTH] debug_wb_rf_wdata
 
     );
 	wire i_rst; 
@@ -82,7 +82,7 @@ module WHUCPU(
 	wire [`INST_ADDR_WIDTH] branch_pc;
 	wire is_branch;
 	wire flush;
-	wire [`INST_ADDR_WIDTH] if_pc;
+	(*mark_debug = "true"*) wire [`INST_ADDR_WIDTH] if_pc;
 	wire imem_ce;
 	wire [`INST_ADDR_WIDTH] exp_pc;
 	wire stall_req_from_if;
@@ -100,7 +100,7 @@ module WHUCPU(
 	);
 
 
-	wire [`REG_WIDTH] if_inst;
+	(*mark_debug = "true"*) wire [`REG_WIDTH] if_inst;
 	wire exp_mem_en;
 	wire [`REG_WIDTH] mem_alu_result;
 	wire [3:0] mem_mem_wen;
@@ -115,7 +115,7 @@ module WHUCPU(
 		.i_aclk(i_clk), .i_aresetn(i_rst), .i_flush(flush), .i_if_addr(if_pc), .i_if_en(1'b1), .i_if_data(`ZERO_WORD), .i_if_axi_stall(if_axi_stall), .i_ce(imem_ce),
 		.o_if_data(if_inst), .i_mem_addr(mem_alu_result), .i_mem_en(exp_mem_en), .i_mem_wen(mem_n_wen), 
 		.i_mem_data(mem_n_mem_data), .o_mem_data(dmem_data), 
-		.o_arid(arid), .o_araddr(araddr), .o_arsize(arsize), .o_arburst(arburst), .o_arlock(arlock), 
+		.o_arid(arid), .o_araddr(araddr), .o_arlen(arlen), .o_arsize(arsize), .o_arburst(arburst), .o_arlock(arlock), 
 		.o_arcache(arcache), .o_arprot(arprot), .o_arvalid(arvalid), .i_arready(arready),
 		.i_rid(rid), .i_rdata(rdata), .i_rresp(rresp), .i_rlast(rlast), .i_rvalid(rvalid), .o_rready(rready),
 		.o_awid(awid), .o_awaddr(awaddr), .o_awlen(awlen), .o_awsize(awsize), .o_awburst(awburst), .o_awlock(awlock) ,.o_awcache(awcache), .o_awprot(awprot), .o_awvalid(awvalid), .i_awready(awready),
@@ -124,8 +124,8 @@ module WHUCPU(
 		.o_stall_req_from_if(stall_req_from_if), .o_stall_req_from_mem(stall_req_from_mem), .o_if_read_result_flag(if_read_result_flag), .o_me_read_result_flag()
 	);
 
-	wire [`INST_ADDR_WIDTH] id_pc;
-	wire [`INST_WIDTH] id_inst;
+	(*mark_debug = "true"*) wire [`INST_ADDR_WIDTH] id_pc;
+	(*mark_debug = "true"*) wire [`INST_WIDTH] id_inst;
 	wire [31:0] id_exp_type;
 	wire [`INST_ADDR_WIDTH] id_bad_pc;
 	wire id_curr_in_dslot;
@@ -144,7 +144,7 @@ module WHUCPU(
 	wire [`REG_ADDR_WIDTH] id_reg2_addr;
 	wire [`REG_ADDR_WIDTH] id_rd_addr;
 	wire [`REG_ADDR_WIDTH] id_reg3_addr;
-	wire [`ALUOP_WIDTH] id_aluop;
+(*mark_debug = "true"*)	wire [`ALUOP_WIDTH] id_aluop;
 	wire [25:0] id_imm26;
 	wire id_jump;
 	wire id_jump_src;
@@ -153,7 +153,7 @@ module WHUCPU(
 	wire [3:0] id_mem_wen;
 	wire [2:0] id_mem_byte_se;
 	wire id_result_or_mem;
-	wire id_reg3_write;
+(*mark_debug = "true"*)	wire id_reg3_write;
 	wire id_cp0_write;
 	wire [31:0] id_n_exp_type;
 	wire id_hilo_wen;

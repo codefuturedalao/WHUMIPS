@@ -55,22 +55,22 @@ module Axi_Controller(
 	output reg [`REG_WIDTH] o_mem_data,
 
 	output reg [3:0] o_arid, 	//0 : fetch inst  1 : fetch data
-	output reg [31:0] o_araddr,
+(*mark_debug = "true"*)	output reg [31:0] o_araddr,
 	output reg [3:0] o_arlen,
 	output reg [2:0] o_arsize,
 	output reg [1:0] o_arburst,
 	output reg [1:0] o_arlock,
 	output reg [3:0] o_arcache,
 	output reg [2:0] o_arprot,
-	output reg o_arvalid,
-	input wire i_arready,
+(*mark_debug = "true"*)	output reg o_arvalid,
+(*mark_debug = "true"*)	input wire i_arready,
 
 	input wire [3:0] i_rid,
-	input wire [31:0] i_rdata,
+(*mark_debug = "true"*)	input wire [31:0] i_rdata,
     input wire [1:0] i_rresp,
 	input wire i_rlast,
-	input wire i_rvalid,
-	output reg o_rready,
+(*mark_debug = "true"*)	input wire i_rvalid,
+(*mark_debug = "true"*)	output reg o_rready,
 
 	output reg [3:0] o_awid,
 	output reg [31:0] o_awaddr,
@@ -98,7 +98,8 @@ module Axi_Controller(
 	output reg o_stall_req_from_if,
 	output reg o_stall_req_from_mem,
 	output reg o_if_read_result_flag,
-	output reg o_me_read_result_flag
+	output reg o_me_read_result_flag,
+	output reg o_me_write_result_flag
     );
 
 	reg [3:0] r_status;
@@ -156,7 +157,7 @@ module Axi_Controller(
 			if(i_ce == `CHIP_DISABLE || i_flush == `IS_FLUSH) begin 		//initialize
 				o_stall_req_from_mem <= `NO_STALL;
 			end
-			else if(o_me_read_result_flag == 1'b0  && i_mem_en == `CHIP_ENABLE) begin
+			else if(((o_me_read_result_flag == 1'b0  && |i_mem_wen == 1'b0) || (|i_mem_wen == 1'b1 && o_me_write_result_flag == 1'b0)) && i_mem_en == `CHIP_ENABLE ) begin
 				o_stall_req_from_mem <= `IS_STALL;
 			end
 			else begin
@@ -217,14 +218,14 @@ module Axi_Controller(
 								if(i_if_axi_stall == `NO_STALL && o_if_read_result_flag == 1'b1) begin
 										o_if_read_result_flag <= 1'b0;
 								end
-								if(o_if_read_result_flag == 1'b0  && i_if_en == `CHIP_ENABLE && (i_mem_en != `CHIP_ENABLE || (i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b0))) begin		//inst read and no memeory read and have not got the result
+								if(o_if_read_result_flag == 1'b0  && i_if_en == `CHIP_ENABLE && (i_mem_en != `CHIP_ENABLE || (i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b1) || (i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b0 && o_me_read_result_flag == 1'b1))) begin		//inst read and no memeory read and have not got the result
 										o_arid <= inst_rid;		//fetch inst
 										o_araddr <= if_addr;
 										o_arsize <= 3'b010;		//4 byte in transfer
 										o_arvalid <= 1'b1;
 										r_status <= `IF_WA;
 								end
-								else if(o_if_read_result_flag == 1'b0 && i_if_en == `CHIP_ENABLE && i_mem_en == `CHIP_ENABLE) begin		//fetch inst and data simultaneously
+								else if(o_if_read_result_flag == 1'b0 && i_if_en == `CHIP_ENABLE && i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b0 && o_me_read_result_flag == 1'b0) begin		//fetch inst and data simultaneously
 										o_arid <= data_rid;
 										o_araddr <= mem_addr;
 										o_arsize <= 3'b010;
@@ -233,9 +234,7 @@ module Axi_Controller(
 								end
 						end
 						`IF_WA: begin
-								if(i_mem_en == `CHIP_ENABLE) begin
-								end
-								if(i_arready == 1'b1 && i_mem_en == `CHIP_DISABLE) begin
+								if(i_arready == 1'b1 && (i_mem_en == `CHIP_DISABLE || (i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b1)  || (i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b0 && o_me_read_result_flag == 1'b1))) begin
 									//	o_arid <= 1'b0;
 										o_araddr <= `ZERO_WORD;
 										o_arvalid <= 1'b0;
@@ -243,7 +242,7 @@ module Axi_Controller(
 										o_rready <= 1'b1;
 										r_status <= `IF_WD;
 								end
-								else if(i_arready == 1'b1 && i_mem_en == `CHIP_DISABLE) begin
+								else if(i_arready == 1'b1 && i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b0 && o_me_read_result_flag == 1'b0) begin
 										o_arid <= data_rid;			//fetch data
 										o_araddr <= mem_addr;
 										//o_arsize <= 3'b010;
@@ -253,13 +252,13 @@ module Axi_Controller(
 								end
 						end
 						`IF_WD: begin
-								if(i_rvalid == 1'b1 && i_rid == inst_rid && i_mem_en == `CHIP_DISABLE) begin
+								if(i_rvalid == 1'b1 && i_rid == inst_rid && (i_mem_en == `CHIP_DISABLE || (i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b1) || (i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b0 && o_me_read_result_flag == 1'b1))) begin
 									o_rready <= 1'b0;
 									o_if_data <= i_rdata;
 									o_if_read_result_flag <= 1'b1;
 									r_status <= `READ_START;
 								end
-								else if(i_rvalid == 1'b1 && i_rid == inst_rid && i_mem_en == `CHIP_ENABLE) begin
+								else if(i_rvalid == 1'b1 && i_rid == inst_rid && i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b0 && o_me_read_result_flag == 1'b0) begin
 									o_rready <= 1'b0;
 									o_if_data <= i_rdata;
 									o_if_read_result_flag <= 1'b1;
@@ -269,7 +268,7 @@ module Axi_Controller(
 									o_arvalid <= 1'b1;
 									r_status <= `ME_WA;
 								end	
-								else if(i_rvalid == 1'b0 && i_mem_en == `CHIP_ENABLE) begin
+								else if(i_rvalid == 1'b0 && i_mem_en == `CHIP_ENABLE && |i_mem_wen == 1'b0 && o_me_read_result_flag == 1'b0) begin
 									o_arid <= data_rid;			//fetch data
 									o_araddr <= mem_addr;
 									//o_arsize <= 3'b010;
@@ -338,7 +337,7 @@ module Axi_Controller(
 								end
 						end
 						`ME_WA: begin
-								if(i_arready == 1'b1 && i_mem_en == `CHIP_ENABLE && o_if_read_result_flag == 1'b0) begin
+								if(i_arready == 1'b1 && i_if_en == `CHIP_ENABLE && o_if_read_result_flag == 1'b0) begin
 										//deliver the inst address
 										//o_arvalid <= 1'b0;	
 										o_araddr <= if_addr;
@@ -347,7 +346,7 @@ module Axi_Controller(
 										o_rready <= 1'b1;
 										r_status <= `IF_WA_ME_WD;
 								end
-								else if(i_arready == 1'b1 && !(i_mem_en == `CHIP_ENABLE && o_if_read_result_flag == 1'b0)) begin
+								else if(i_arready == 1'b1 && !(i_if_en == `CHIP_ENABLE && o_if_read_result_flag == 1'b0)) begin
 										o_arvalid <= 1'b0;	
 										o_araddr <= `ZERO_WORD;
 										o_arid <= inst_rid;
@@ -382,6 +381,25 @@ module Axi_Controller(
 										//do nothing
 								end
 						end
+						default: begin
+								o_mem_data <= `ZERO_WORD;
+								o_if_data <= `ZERO_WORD;
+								r_status <= `READ_START;
+								o_if_read_result_flag <= 1'b0;
+								o_me_read_result_flag <= 1'b0;
+								o_rready <= 1'b0;
+								o_arvalid <= 1'b0;
+								o_arprot <= 3'b000;
+								o_arcache <= 4'b0000;
+								o_arlock <= 2'b00;
+								o_arburst <= 2'b01;				
+								o_arsize <= 4'b0000;
+								o_arlen <= 4'b0000;		//transfre data 1 times
+								o_araddr <= `ZERO_WORD;
+								o_arid <= 4'b0000;
+								inst_rid <= 4'b0000;
+								data_rid <= 4'b0001;
+						end
 					endcase
 
 				end
@@ -400,18 +418,23 @@ module Axi_Controller(
 					o_wid <= 4'b0001; 				//ID number
 					o_awvalid <= 1'b0;
 					o_awprot <= 3'b000;				//protect attribute
+					o_awburst <= 2'b01;             //incrementing-address burst
+
 					o_awcache <= 4'b0000;			//cache attribute
 					o_awlock <= 2'b00;				//atom lock
-					o_awlock <= 2'b01;				//incrementing-address burst
 					o_awsize <= 3'b000;
 					o_awlen <= 4'b0000;		//transfer data 1 times
 					o_awaddr <= `ZERO_WORD;
 					o_awid <= 4'b0001;				//ID number
+					o_me_write_result_flag <= 1'b0;
 				end
 				else begin
+					if(o_stall_req_from_mem == `NO_STALL && o_me_write_result_flag == 1'b1) begin
+							o_me_write_result_flag <= 1'b0;
+					end
 					case(w_status)
 						`WRITE_START: begin
-							if((i_mem_en == `CHIP_ENABLE) && (|i_mem_wen == 1'b1)) begin
+							if(o_me_write_result_flag == 1'b0 && (i_mem_en == `CHIP_ENABLE) && (|i_mem_wen == 1'b1)) begin
 								o_awaddr <= mem_addr;
 								o_awsize <= 3'b010;			//4 byte in transfer
 								o_awvalid <= 1'b1;
@@ -449,11 +472,32 @@ module Axi_Controller(
 							if(i_bvalid == 1'b1) begin
 								o_bready <= 1'b0;
 								w_status <= `WRITE_START;
+								o_me_write_result_flag <= 1'b1;
 							end
+						end
+						default: begin
+								w_status <= `WRITE_START;
+								o_bready <= 1'b0;
+								o_wvalid <= 1'b0;
+								o_wlast <= 1'b1;
+								o_wstrb <= 4'b0000;
+								o_wdata <= `ZERO_WORD;
+								o_wid <= 4'b0001; 				//ID number
+								o_awvalid <= 1'b0;
+								o_awprot <= 3'b000;				//protect attribute
+								o_awburst <= 2'b01;             //incrementing-address burst
+
+								o_awcache <= 4'b0000;			//cache attribute
+								o_awlock <= 2'b00;				//atom lock
+								o_awsize <= 3'b000;
+								o_awlen <= 4'b0000;		//transfer data 1 times
+								o_awaddr <= `ZERO_WORD;
+								o_awid <= 4'b0001;				//ID number
 						end
 					endcase
 				end
 			end
+
 
 
 

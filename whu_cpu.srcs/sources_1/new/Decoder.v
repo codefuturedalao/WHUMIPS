@@ -65,19 +65,26 @@ module Decoder(
 	always
 		@(*) begin
 			syscall <= `NO_EXCEPTION;
-			eret <= `NO_EXCEPTION; 
 			break <=  `NO_EXCEPTION;
 			inst_valid <= `INST_NO_VALID;
             o_reg1_read <= `REG_READ;
             o_reg2_read <= `REG_READ;
             o_reg3_addr <= i_inst[15:11];
             o_aluop <= `NOP_ALU_OPCODE;
-            o_jump <= `NO_JUMP;
-            o_jump_src <= `JUMP_FROM_REG;
-            o_branch <= `NO_BRANCH;
-            o_result_or_mem <= `REG3_FROM_RESULT;
             o_reg3_write <= `REG3_WRITE;
 			o_hilo_write <= `HILO_NO_WRITE;
+
+			o_mem_en <= `MEM_DISABLE;
+			o_mem_wen <= 4'b0000;  //may be it represent read, i am not sure 07/05
+			o_mem_byte_se <= `MEM_SE_BYTE;
+			o_result_or_mem <= `REG3_FROM_RESULT; //it doesn't matter bec reg3 no write
+
+			o_jump <= `NO_JUMP;
+			o_jump_src <= `JUMP_FROM_REG;
+			o_branch <= `NO_BRANCH;
+
+			o_cp0_write <= `CP0_NO_WRITE;
+			eret <= `NO_EXCEPTION; 
 			case(opcode)
 				`ADDI_OPCODE: begin
 					o_aluop <= `ADDI_ALU_OPCODE;
@@ -126,6 +133,76 @@ module Decoder(
 					o_aluop <= `XORI_ALU_OPCODE;
 					o_reg2_read <= `REG_NO_READ;
 					o_reg3_addr <= i_inst[20:16];
+					inst_valid <= `INST_VALID;
+				end
+/* load and store */
+				`LB_OPCODE: begin
+					o_aluop <= `LB_ALU_OPCODE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_byte_se <= `MEM_SE_BYTE;
+					o_reg2_read <= `REG_NO_READ;
+					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
+				end	
+				`LBU_OPCODE: begin
+					o_aluop <= `LBU_ALU_OPCODE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_byte_se <= `MEM_SE_BYTE_U;
+					o_reg2_read <= `REG_NO_READ;
+					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
+				end	
+				`LH_OPCODE: begin
+					o_aluop <= `LH_ALU_OPCODE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_byte_se <= `MEM_SE_HALF;
+					o_reg2_read <= `REG_NO_READ;
+					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
+				end	
+				`LHU_OPCODE: begin
+					o_aluop <= `LHU_ALU_OPCODE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_byte_se <= `MEM_SE_HALF_U;
+					o_reg2_read <= `REG_NO_READ;
+					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
+				end	
+				`LW_OPCODE: begin
+					o_aluop <= `LW_ALU_OPCODE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_byte_se <= `MEM_SE_WORD;
+					o_reg2_read <= `REG_NO_READ;
+					o_reg3_addr <= i_inst[20:16];			
+					o_result_or_mem <= `REG3_FROM_MEM;
+					inst_valid <= `INST_VALID;
+				end	
+				`SB_OPCODE: begin
+					o_aluop <= `SB_ALU_OPCODE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_wen <= 4'b0001;
+					//o_mem_byte_se <= `MEM_SE_BYTE;
+					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
+				end	
+				`SH_OPCODE: begin
+					o_aluop <= `SH_ALU_OPCODE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_wen <= 4'b0011;
+					//o_mem_byte_se <= `MEM_SE_BYTE;
+					o_reg3_write <= `REG3_NO_WRITE;
+					inst_valid <= `INST_VALID;
+				end	
+				`SW_OPCODE: begin
+					o_aluop <= `SW_ALU_OPCODE;
+					o_mem_en <= `MEM_ENABLE;
+					o_mem_wen <= 4'b1111;
+					//o_mem_byte_se <= `MEM_SE_BYTE;
+					o_reg3_write <= `REG3_NO_WRITE;
 					inst_valid <= `INST_VALID;
 				end
 				`SPECIAL_OPCODE: begin
@@ -258,31 +335,27 @@ module Decoder(
 							inst_valid <= `INST_VALID;
 							syscall <= `IS_EXCEPTION;
 						end
+						/* branch and jump */
+						`JR_OPCODE: begin
+							o_aluop <= `JR_ALU_OPCODE;
+							o_jump <= `IS_JUMP;
+							o_reg2_read <= `REG_NO_READ;
+							o_reg3_addr <= 5'b11111;
+							o_reg3_write <= `REG3_NO_WRITE;
+							inst_valid <= `INST_VALID;
+						end	
+						`JALR_OPCODE: begin
+							o_aluop <= `JALR_ALU_OPCODE;
+							o_jump <= `IS_JUMP;
+							o_reg2_read <= `REG_NO_READ;
+							inst_valid <= `INST_VALID;
+						end	
 						default: begin
 							//nothing
 						end
 					endcase
 				end
-				default: begin
-					//nothing
-				end
-			endcase 
-		end
-
-/*branch and jump*/
-	always
-		@(*) begin
-			case(opcode)
-				//o_reg1_read <= `REG_READ;
-				//o_reg2_read <= `REG_READ;
-				//o_reg3_addr <= i_inst[15:11]; //it doesn't matter bec reg3 no write
-				//o_aluop <= 6'b000_000;
-				//o_jump <= `NO_JUMP;
-				//o_jump_src <= `JUMP_FROM_REG;
-				//o_branch <= `NO_BRANCH;
-				//o_mem_write <= `MEM_NO_WRITE;
-				//o_result_or_mem <= `REG3_FROM_RESULT; //it doesn't matter bec reg3 no write
-				//o_reg3_write <= `REG3_WRITE;
+/* branch and jump */
 				`BEQ_OPCODE: begin
 					o_aluop <= `BEQ_ALU_OPCODE;
 					o_branch <= `IS_BRANCH;
@@ -355,154 +428,40 @@ module Decoder(
 							o_branch <= `IS_BRANCH;
 							inst_valid <= `INST_VALID;
 						end
-					endcase
-				end
-				`SPECIAL_OPCODE: begin
-					case(imm5_0)
-						`JR_OPCODE: begin
-							o_aluop <= `JR_ALU_OPCODE;
-							o_jump <= `IS_JUMP;
-							o_reg2_read <= `REG_NO_READ;
-							o_reg3_addr <= 5'b11111;
-							o_reg3_write <= `REG3_NO_WRITE;
-							inst_valid <= `INST_VALID;
-						end	
-						`JALR_OPCODE: begin
-							o_aluop <= `JALR_ALU_OPCODE;
-							o_jump <= `IS_JUMP;
-							o_reg2_read <= `REG_NO_READ;
-							inst_valid <= `INST_VALID;
-						end	
 						default: begin
-							//nothing	
+						    o_aluop <= `NOP_ALU_OPCODE;
+						    o_reg1_read <= `REG_NO_READ;
+							o_reg2_read <= `REG_NO_READ;
+							o_reg3_write <= `REG3_NO_WRITE;
 						end
 					endcase
 				end
-			endcase
-		end
-
-/*load and store*/
-	always
-		@(*) begin
-			o_mem_en <= `MEM_DISABLE;
-			o_mem_wen <= 4'b0000;  //may be it represent read, i am not sure 07/05
-			o_mem_byte_se <= `MEM_SE_BYTE;
-			case(opcode)
-				//o_reg1_read <= `REG_READ;
-				//o_reg2_read <= `REG_READ;
-				//o_reg3_addr <= i_inst[15:11]; //it doesn't matter bec reg3 no write
-				//o_aluop <= 6'b000_000;
-				//o_jump <= `NO_JUMP;
-				//o_jump_src <= `JUMP_FROM_REG;
-				//o_branch <= `NO_BRANCH;
-				//o_result_or_mem <= `REG3_FROM_RESULT; //it doesn't matter bec reg3 no write
-				//o_reg3_write <= `REG3_WRITE;
-				`LB_OPCODE: begin
-					o_aluop <= `LB_ALU_OPCODE;
-					o_mem_en <= `MEM_ENABLE;
-					o_mem_byte_se <= `MEM_SE_BYTE;
-					o_reg2_read <= `REG_NO_READ;
-					o_reg3_addr <= i_inst[20:16];			
-					o_result_or_mem <= `REG3_FROM_MEM;
-					inst_valid <= `INST_VALID;
-				end	
-				`LBU_OPCODE: begin
-					o_aluop <= `LBU_ALU_OPCODE;
-					o_mem_en <= `MEM_ENABLE;
-					o_mem_byte_se <= `MEM_SE_BYTE_U;
-					o_reg2_read <= `REG_NO_READ;
-					o_reg3_addr <= i_inst[20:16];			
-					o_result_or_mem <= `REG3_FROM_MEM;
-					inst_valid <= `INST_VALID;
-				end	
-				`LH_OPCODE: begin
-					o_aluop <= `LH_ALU_OPCODE;
-					o_mem_en <= `MEM_ENABLE;
-					o_mem_byte_se <= `MEM_SE_HALF;
-					o_reg2_read <= `REG_NO_READ;
-					o_reg3_addr <= i_inst[20:16];			
-					o_result_or_mem <= `REG3_FROM_MEM;
-					inst_valid <= `INST_VALID;
-				end	
-				`LHU_OPCODE: begin
-					o_aluop <= `LHU_ALU_OPCODE;
-					o_mem_en <= `MEM_ENABLE;
-					o_mem_byte_se <= `MEM_SE_HALF_U;
-					o_reg2_read <= `REG_NO_READ;
-					o_reg3_addr <= i_inst[20:16];			
-					o_result_or_mem <= `REG3_FROM_MEM;
-					inst_valid <= `INST_VALID;
-				end	
-				`LW_OPCODE: begin
-					o_aluop <= `LW_ALU_OPCODE;
-					o_mem_en <= `MEM_ENABLE;
-					o_mem_byte_se <= `MEM_SE_WORD;
-					o_reg2_read <= `REG_NO_READ;
-					o_reg3_addr <= i_inst[20:16];			
-					o_result_or_mem <= `REG3_FROM_MEM;
-					inst_valid <= `INST_VALID;
-				end	
-				`SB_OPCODE: begin
-					o_aluop <= `SB_ALU_OPCODE;
-					o_mem_en <= `MEM_ENABLE;
-					o_mem_wen <= 4'b0001;
-					//o_mem_byte_se <= `MEM_SE_BYTE;
-					o_reg3_write <= `REG3_NO_WRITE;
-					inst_valid <= `INST_VALID;
-				end	
-				`SH_OPCODE: begin
-					o_aluop <= `SH_ALU_OPCODE;
-					o_mem_en <= `MEM_ENABLE;
-					o_mem_wen <= 4'b0011;
-					//o_mem_byte_se <= `MEM_SE_BYTE;
-					o_reg3_write <= `REG3_NO_WRITE;
-					inst_valid <= `INST_VALID;
-				end	
-				`SW_OPCODE: begin
-					o_aluop <= `SW_ALU_OPCODE;
-					o_mem_en <= `MEM_ENABLE;
-					o_mem_wen <= 4'b1111;
-					//o_mem_byte_se <= `MEM_SE_BYTE;
-					o_reg3_write <= `REG3_NO_WRITE;
-					inst_valid <= `INST_VALID;
-				end	
-				default: begin
-					//nothing
-				end
-			endcase
-		end
-
-/* priviledged instruction */
-	always
-		@(*) begin
-			o_cp0_write <= `CP0_NO_WRITE;
-			case(opcode)
 				`PRIV_OPCODE: begin
 						case(o_reg1_addr) 
 								`ERET_OPCODE: begin
-									o_cp0_write <= `CP0_NO_WRITE; // emmmm
-									o_aluop <= `ERET_ALU_OPCODE;
-								   	o_reg3_write <= `REG3_NO_WRITE;	
-									o_reg1_read <= `REG_NO_READ;
-									o_reg2_read <= `REG_NO_READ;
-									inst_valid <= `INST_VALID;
-									eret <= `IS_EXCEPTION;
+										o_cp0_write <= `CP0_NO_WRITE; // emmmm
+										o_aluop <= `ERET_ALU_OPCODE;
+										o_reg3_write <= `REG3_NO_WRITE;	
+										o_reg1_read <= `REG_NO_READ;
+										o_reg2_read <= `REG_NO_READ;
+										inst_valid <= `INST_VALID;
+										eret <= `IS_EXCEPTION;
 								end
 								`MFC0_OPCODE: begin
-									o_cp0_write <= `CP0_NO_WRITE;
-									o_aluop <= `MFC0_ALU_OPCODE;
-								   	o_reg3_write <= `REG3_WRITE;	
-									o_reg1_read <= `REG_NO_READ;
-									o_reg3_addr <= i_inst[20:16];
-									inst_valid <= `INST_VALID;
+										o_cp0_write <= `CP0_NO_WRITE;
+										o_aluop <= `MFC0_ALU_OPCODE;
+										o_reg3_write <= `REG3_WRITE;	
+										o_reg1_read <= `REG_NO_READ;
+										o_reg3_addr <= i_inst[20:16];
+										inst_valid <= `INST_VALID;
 								end
 								`MTC0_OPCODE: begin
-									o_cp0_write <= `CP0_WRITE;
-									o_aluop <= `MTC0_ALU_OPCODE;
-								   	o_reg3_write <= `REG3_NO_WRITE;	
-									o_reg1_read <= `REG_NO_READ;
-									o_cp0_write <= `CP0_WRITE;
-									inst_valid <= `INST_VALID;
+										o_cp0_write <= `CP0_WRITE;
+										o_aluop <= `MTC0_ALU_OPCODE;
+										o_reg3_write <= `REG3_NO_WRITE;	
+										o_reg1_read <= `REG_NO_READ;
+										o_cp0_write <= `CP0_WRITE;
+										inst_valid <= `INST_VALID;
 								end
 								default: begin
 										//do nothing
@@ -510,9 +469,10 @@ module Decoder(
 						endcase
 				end
 				default: begin
-						//do nothing
+					//nothing
 				end
-			endcase
+			endcase 
 		end
+
 
 endmodule

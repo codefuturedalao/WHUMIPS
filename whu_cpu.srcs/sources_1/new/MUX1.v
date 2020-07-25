@@ -43,6 +43,9 @@ module MUX1(
 			else if(i_forwardA == 2'b10) begin
 				o_reg1_data <= i_mem_reg3_data;
 			end
+			else begin
+				o_reg1_data <= i_reg1_data;
+			end
 			//reg2_data
 			if(i_forwardB == 2'b00) begin
 				o_reg2_data <= i_reg2_data;
@@ -52,6 +55,9 @@ module MUX1(
 			end
 			else if(i_forwardB == 2'b10) begin
 				o_reg2_data <= i_mem_reg3_data;
+			end
+			else begin
+				o_reg2_data <= i_reg2_data;
 			end
 		end
 

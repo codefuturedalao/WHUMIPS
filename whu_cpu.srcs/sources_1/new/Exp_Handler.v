@@ -56,6 +56,7 @@ module Exp_Handler(
 				else begin
 						cp0_status <= i_cp0_status;
 				end
+
 				if(i_wb_cp0_write == `CP0_WRITE && i_wb_rd_addr == `CP0_REG_CAUSE && i_wb_cp0_sel == 3'b000) begin
 						cp0_cause[9:8] <= i_wb_cp0_data[9:8];
 						cp0_cause[22] <= i_wb_cp0_data[22];
@@ -64,6 +65,7 @@ module Exp_Handler(
 				else begin
 						cp0_cause <= i_cp0_cause;
 				end
+
 				if(i_wb_cp0_write == `CP0_WRITE && i_wb_rd_addr == `CP0_REG_EPC && i_wb_cp0_sel == 3'b000) begin
 						cp0_epc <= i_wb_cp0_data;
 				end

@@ -67,14 +67,14 @@ module ALU(
 	reg [32:0] mul_operand2;
 	wire [65:0] mul_result;
 	reg [2:0] mul_status;
-	reg mul_signal;
+	//reg mul_signal;
 	reg mul_done;
 	always
 		@(posedge i_clk) begin
 			if(i_rst == `RST_ENABLE) begin 		//initialize
-				mul_signal <= 1'b0;
-				mul_ce <= 1'b0;
-				mul_sclr <= 1'b0;
+				//mul_signal <= 1'b0;
+				//mul_ce <= 1'b0;
+				//mul_sclr <= 1'b0;
 				mul_status <= 3'b0;
 				mul_done <= 1'b0;
 			end
@@ -109,15 +109,15 @@ module ALU(
 	wire m_axis_dout_tvalid;
 	wire [79:0] m_axis_dout_tdata;
 	reg [2:0] div_status;
-	reg div_signal;
+	//reg div_signal;
 	reg div_done;
 	always
 		@(posedge i_clk) begin
 			if(i_rst == `RST_ENABLE) begin
-				s_axis_divisor_tvalid <= 1'b0;
-				s_axis_divisor_tdata <= `ZERO_WORD;
-				s_axis_dividend_tvalid <= 1'b0;
-				s_axis_dividend_tdata <= `ZERO_WORD;
+		//		s_axis_divisor_tvalid <= 1'b0;
+				//s_axis_divisor_tdata <= `ZERO_WORD;
+		//		s_axis_dividend_tvalid <= 1'b0;
+				//s_axis_dividend_tdata <= `ZERO_WORD;
 			end
 			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status != 3'b101) begin
 				div_status <= div_status + 1'b1;
@@ -156,6 +156,10 @@ module ALU(
 			mul_sclr <= 1'b1;
 			s_axis_divisor_tvalid <= 1'b0; 
 			s_axis_dividend_tvalid <= 1'b0;
+			mul_operand1 <= `ZERO_WORD;		
+			mul_operand2 <= `ZERO_WORD; 
+			s_axis_divisor_tdata <= `ZERO_WORD;
+			s_axis_dividend_tdata <= `ZERO_WORD;
 			case(i_aluop)
 				`MULT_ALU_OPCODE: begin
 					mul_operand1 <= {{8{i_reg1_ndata[31]}},i_reg1_ndata[31:0]};		
@@ -195,7 +199,7 @@ module ALU(
 						//s_axis_divisor_tdata <= i_reg2_ndata[31:0];
 						//s_axis_dividend_tdata <= i_reg1_ndata[31:0];
 						if(div_done != 1'b1) begin
-							div_signal <= 1'b1;
+							//div_signal <= 1'b1;
 							o_stall <= `IS_STALL;
 							if(div_status == 3'b000) begin
 									s_axis_divisor_tvalid <= 1'b1; 
@@ -207,7 +211,7 @@ module ALU(
 							end
 						end
 						else begin
-							div_signal <= 1'b0;
+							//div_signal <= 1'b0;
 							o_stall <= `NO_STALL;
 							o_hi <= m_axis_dout_tdata[31:0];
 							o_lo <= m_axis_dout_tdata[71:40];
@@ -219,13 +223,13 @@ module ALU(
 						s_axis_divisor_tdata <= {8'b0 ,i_reg2_ndata[31:0]};
 						s_axis_dividend_tdata <= {8'b0 ,i_reg1_ndata[31:0]};
 						if(div_done != 1'b1) begin
-							div_signal <= 1'b1;
+							//div_signal <= 1'b1;
 							o_stall <= `IS_STALL;
 							s_axis_divisor_tvalid <= 1'b1; 
 							s_axis_dividend_tvalid <= 1'b1;
 						end
 						else begin
-							div_signal <= 1'b0;
+							//div_signal <= 1'b0;
 							o_stall <= `NO_STALL;
 							o_hi <= m_axis_dout_tdata[31:0];
 							o_lo <= m_axis_dout_tdata[71:40];
@@ -237,11 +241,13 @@ module ALU(
 					if(add_result_reg[32] ^ add_result_reg[31] == 1'b1) begin //overflow
 						overflow <= `IS_EXCEPTION;
 						o_alu_result <= `ZERO_WORD;
-					end else begin	
+					end 
+					else begin	
 						o_alu_result <= add_result_reg[31:0];
 					end
 				end	
-				`ADDI_ALU_OPCODE: begin if(add_result_imm[32] ^ add_result_imm[31] == 1'b1) begin //overflow
+				`ADDI_ALU_OPCODE: begin 
+					if(add_result_imm[32] ^ add_result_imm[31] == 1'b1) begin //overflow
 						overflow <= `IS_EXCEPTION;
 						o_alu_result <= `ZERO_WORD;
 					end else begin	
@@ -347,16 +353,7 @@ module ALU(
 					o_alu_result <= i_nlo;		//write to the rd
 					o_lo <= i_reg1_ndata;
 				end
-				default: begin
-				    //todo
-				end
-			endcase
-		end
-
 /*branch and jump */
-	always
-		@(*) begin
-			case(i_aluop)
 				`BEQ_ALU_OPCODE: begin
 					o_alu_result <= `ZERO_WORD;
 				end	
@@ -388,32 +385,21 @@ module ALU(
 				`JAL_ALU_OPCODE: begin
 					o_alu_result <= i_pc + 8;	
 				end
-				`JR_ALU_OPCODE: begin
+				//`JR_ALU_OPCODE: begin
 					//nothing
-					o_alu_result <= `ZERO_WORD;
-				end
+				//	o_alu_result <= `ZERO_WORD;
+				//end
 				`JALR_ALU_OPCODE: begin
 					o_alu_result <= i_pc + 8;	
 				end
-			endcase
-		end
 /* priviliged instruction */
-	always
-		@(*) begin
-			case(i_aluop)
-					`MFC0_ALU_OPCODE: begin
+				`MFC0_ALU_OPCODE: begin
 						o_alu_result <= i_cp0_ndata;
-					end
-					`MTC0_ALU_OPCODE: begin
+				end
+				`MTC0_ALU_OPCODE: begin
 						o_alu_result <= i_reg2_ndata;
-					end
-			endcase
-		end
+				end
 /* access memory */
-	always
-		@(*) begin
-			case(i_aluop)
-				//lb and lbu is the same as addiu
 				`LH_ALU_OPCODE: begin
 					o_alu_result <= add_result_imm;
 					no_align <= add_result_imm[0];
@@ -423,9 +409,10 @@ module ALU(
 					o_alu_result <= add_result_imm;
 					no_align <= add_result_imm[1] | add_result_imm[0];
 				end
-				//sb is the same as addiu
-				//sh is the same as lh
-				//sw is the same as lw
-			endcase	
+				default: begin
+					o_alu_result <= `ZERO_WORD;
+				end
+			endcase
 		end
+
 endmodule

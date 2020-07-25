@@ -95,6 +95,9 @@ module CP0(
 								o_cause[23] <= i_wb_cp0_data[23];
 								o_cause[22] <= i_wb_cp0_data[22];
 							end
+							default: begin
+							     //do nothing
+							end
 						endcase
 				end
 				/*when exception occur*/

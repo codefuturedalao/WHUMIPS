@@ -28,8 +28,8 @@ module PC(
 	input wire [`STALL_WIDTH] i_stall,
 	input wire i_flush,
 	input wire [`INST_ADDR_WIDTH] i_new_pc,
-	input wire [`INST_ADDR_WIDTH] i_branch_pc,
-	input wire i_isbranch,
+(*mark_debug = "true"*)	input wire [`INST_ADDR_WIDTH] i_branch_pc,
+(*mark_debug = "true"*)	input wire i_isbranch,
 	input wire i_curr_in_dslot,
 	output reg [`INST_ADDR_WIDTH] o_pc,
 	output reg [`INST_ADDR_WIDTH] o_bad_pc,
@@ -42,8 +42,6 @@ module PC(
 		@(posedge i_clk) begin
 			if(i_rst == `RST_ENABLE) begin
 				o_ce <= `CHIP_DISABLE;
-				o_exp_type <= `ZERO_WORD;
-				o_bad_pc <= `ZERO_WORD;
 			end
 			else begin
 				o_ce <= `CHIP_ENABLE;
@@ -54,6 +52,8 @@ module PC(
 			if(o_ce == `CHIP_DISABLE) begin
 					o_pc <= `DEFAULT_PC;
 					o_exp_type <= `ZERO_WORD;
+					o_exp_type <= `ZERO_WORD;
+					o_bad_pc <= `ZERO_WORD;
 			end
 			else if(i_flush == `IS_FLUSH) begin
 					if(i_new_pc[1:0] == 2'b0) begin
