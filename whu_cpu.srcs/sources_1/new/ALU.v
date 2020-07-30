@@ -78,11 +78,11 @@ module ALU(
 				mul_status <= 3'b0;
 				mul_done <= 1'b0;
 			end
-			else if((i_aluop == `MULT_ALU_OPCODE || i_aluop == `MULTU_ALU_OPCODE) && mul_status != 3'b101) begin
+			else if((i_aluop == `MULT_ALU_OPCODE || i_aluop == `MULTU_ALU_OPCODE || i_aluop == `MUL_ALU_OPCODE) && mul_status != 3'b101) begin
 				mul_status <= mul_status + 1'b1;
 				mul_done <= 1'b0;
 			end
-			else if((i_aluop == `MULT_ALU_OPCODE || i_aluop == `MULTU_ALU_OPCODE) && mul_status == 3'b101) begin
+			else if((i_aluop == `MULT_ALU_OPCODE || i_aluop == `MULTU_ALU_OPCODE || i_aluop == `MUL_ALU_OPCODE) && mul_status == 3'b101) begin
 				mul_status <= 3'b000;
 				mul_done <= 1'b1;
 			end
@@ -108,7 +108,7 @@ module ALU(
 	reg [39:0] s_axis_dividend_tdata;
 	wire m_axis_dout_tvalid;
 	wire [79:0] m_axis_dout_tdata;
-	reg [2:0] div_status;
+	reg [3:0] div_status;
 	//reg div_signal;
 	reg div_done;
 	always
@@ -119,16 +119,16 @@ module ALU(
 		//		s_axis_dividend_tvalid <= 1'b0;
 				//s_axis_dividend_tdata <= `ZERO_WORD;
 			end
-			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status != 3'b101) begin
+			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status != 4'b1001) begin
 				div_status <= div_status + 1'b1;
 				div_done <= 1'b0;
 			end
-			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status == 3'b101) begin
-				div_status <= 3'b000; 
+			else if((i_aluop == `DIV_ALU_OPCODE || i_aluop == `DIVU_ALU_OPCODE) && div_status == 4'b1001) begin
+				div_status <= 4'b0000; 
 				div_done <= 1'b1;
 			end
 			else begin
-				div_status <= 3'b000; 
+				div_status <= 4'b0000; 
 				div_done <= 1'b0;
 			end
 		end
@@ -161,6 +161,22 @@ module ALU(
 			s_axis_divisor_tdata <= `ZERO_WORD;
 			s_axis_dividend_tdata <= `ZERO_WORD;
 			case(i_aluop)
+			     `MUL_ALU_OPCODE: begin
+			        mul_operand1 <= {{8{i_reg1_ndata[31]}},i_reg1_ndata[31:0]};		
+					mul_operand2 <= {{8{i_reg2_ndata[31]}},i_reg2_ndata[31:0]};		
+					if(mul_done != 1'b1) begin
+						mul_sclr <= 1'b0;
+						mul_ce <= 1'b1;
+						o_stall <= `IS_STALL;
+						o_alu_result <= `ZERO_WORD;
+					end
+					else if(mul_done == 1'b1) begin
+						o_stall <= `NO_STALL;
+						mul_sclr <= 1'b1;
+						mul_ce <= 1'b0;
+						o_alu_result <= mul_result[31:0];
+					end   
+			     end
 				`MULT_ALU_OPCODE: begin
 					mul_operand1 <= {{8{i_reg1_ndata[31]}},i_reg1_ndata[31:0]};		
 					mul_operand2 <= {{8{i_reg2_ndata[31]}},i_reg2_ndata[31:0]};		
@@ -201,7 +217,7 @@ module ALU(
 						if(div_done != 1'b1) begin
 							//div_signal <= 1'b1;
 							o_stall <= `IS_STALL;
-							if(div_status == 3'b000) begin
+							if(div_status == 4'b0000) begin
 									s_axis_divisor_tvalid <= 1'b1; 
 									s_axis_dividend_tvalid <= 1'b1;
 							end

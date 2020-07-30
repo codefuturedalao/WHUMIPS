@@ -1,7 +1,6 @@
 `timescale 1ns / 1ps
 `include "defines.v"
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
+////////////////////////////////////////////////////////////////////////////////// // Company: 
 // Engineer: 
 // 
 // Create Date: 07/11/2020 05:17:07 PM
@@ -25,23 +24,23 @@
 module CP0(
 	input wire i_clk,
 	input wire i_rst,
-	input wire [5:0] i_int,
+(*mark_debug = "true"*)	input wire [5:0] i_int,
 	input wire [`REG_ADDR_WIDTH] i_ex_rd_addr,
    	input wire [2:0] i_ex_cp0_sel,
 	input wire [2:0] i_wb_cp0_sel,
 	input wire [`REG_WIDTH] i_wb_cp0_data,
 	input wire [`REG_ADDR_WIDTH] i_wb_rd_addr,
 	input wire i_wb_cp0_write,
-	input wire [31:0] i_exp_type,
+(*mark_debug = "true"*)	input wire [31:0] i_exp_type,
 	input wire i_curr_in_dslot,
-	input wire [`INST_ADDR_WIDTH] i_pc,
+(*mark_debug = "true"*)	input wire [`INST_ADDR_WIDTH] i_pc,
 	input wire [`REG_WIDTH] i_bad_addr,
 
 	output reg [`REG_WIDTH] o_ex_cp0_data,
 	output reg o_timer_int,
-	output reg [`REG_WIDTH] o_status,
-	output reg [`REG_WIDTH] o_cause,
-	output reg [`REG_WIDTH] o_epc
+(*mark_debug = "true"*)	output reg [`REG_WIDTH] o_status,
+(*mark_debug = "true"*)	output reg [`REG_WIDTH] o_cause,
+(*mark_debug = "true"*)	output reg [`REG_WIDTH] o_epc
     );
 
 	
@@ -53,6 +52,8 @@ module CP0(
 //	reg [`REG_WIDTH] epc;
 	reg [`REG_WIDTH] prid;
 	reg [`REG_WIDTH] conf;
+	//reg [`REG_WIDHT] Ebase;
+	reg count_flag;
 
 
 	always
@@ -60,19 +61,28 @@ module CP0(
 			if(i_rst == `RST_ENABLE) begin
 				count <= `ZERO_WORD;
 				compare <= `ZERO_WORD;
-				o_status <= 32'b0001_0000_0000_0000_0000_0000_0000_0000;
+				o_status <= 32'b0000_0000_0100_0000_1111_1111_0000_0000;
 				o_cause <= `ZERO_WORD;
 				o_epc <= `ZERO_WORD;
-				conf <= 32'b0000_0000_0000_0000_10000_0000_0000_0000; //little endian
+				conf <= 32'b0000_0000_0000_0000_1000_0000_0000_0000; //little endian
 				prid <= 32'b0000_0000_0100_1100_0000_0001_0000_0010;
 				badVAddr <= 32'h0000_0000;
 				o_timer_int <= `INT_NO_ASSERTION;
+				count_flag <= 1'b0;
 			end
 			else begin
-				count <= count + 1;
+				if(count_flag == 1'b1) begin
+					count <= count + 1;
+					count_flag <= 1'b0;
+				end
+				else begin
+					count_flag <= 1'b1;
+				end
 				o_cause[15:10] <= i_int;
 				if (compare != `ZERO_WORD && count == compare) begin
 						o_timer_int <= `INT_ASSERTION;
+						o_cause[15] <= `INT_ASSERTION;
+						o_cause[30] <= 1'b1;			//TI 
 				end
 
 				if(i_wb_cp0_write == `CP0_WRITE) begin
@@ -85,15 +95,16 @@ module CP0(
 								o_timer_int <= `INT_NO_ASSERTION;
 							end
 							`CP0_REG_STATUS: begin
-								o_status <= i_wb_cp0_data;	
+								o_status[15:8] <= i_wb_cp0_data[15:8];
+								o_status[1:0] <= i_wb_cp0_data[1:0];
 							end
 							`CP0_REG_EPC: begin
 								o_epc <= i_wb_cp0_data;
 							end
 							`CP0_REG_CAUSE: begin
 								o_cause[9:8] <= i_wb_cp0_data[9:8];
-								o_cause[23] <= i_wb_cp0_data[23];
-								o_cause[22] <= i_wb_cp0_data[22];
+								//o_cause[23] <= i_wb_cp0_data[23];
+								//o_cause[22] <= i_wb_cp0_data[22];
 							end
 							default: begin
 							     //do nothing

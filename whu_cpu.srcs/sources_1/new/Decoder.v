@@ -355,6 +355,19 @@ module Decoder(
 						end
 					endcase
 				end
+				`SPECIAL2_OPCODE: begin
+				    case(imm5_0)
+				        `MUL_OPCODE: begin
+				            o_aluop <= `MUL_ALU_OPCODE;
+							inst_valid <= `INST_VALID;
+							//o_hilo_write <= `HILO_WRITE;
+							//o_reg3_write <= `REG3_NO_WRITE;
+				        end
+				        default: begin
+				            //nothing
+				        end
+				    endcase
+				end
 /* branch and jump */
 				`BEQ_OPCODE: begin
 					o_aluop <= `BEQ_ALU_OPCODE;

@@ -22,11 +22,11 @@
 
 
 module Exp_Handler(
-		input wire [31:0] i_exp_type,
+        input wire [31:0] i_exp_type,
 		input wire [`REG_WIDTH] i_alu_result,
-		input wire [`INST_ADDR_WIDTH] i_pc,
+	    input wire [`INST_ADDR_WIDTH] i_pc,
 		input wire [`REG_WIDTH] i_cp0_status,
-		input wire [`REG_WIDTH] i_cp0_cause,
+	 	input wire [`REG_WIDTH] i_cp0_cause,
 		input wire [`REG_WIDTH] i_cp0_epc,
 		input wire [2:0] i_wb_cp0_sel,
 		input wire [`REG_WIDTH] i_wb_cp0_data,
@@ -35,22 +35,23 @@ module Exp_Handler(
 		input wire i_mem_en,
 		input wire [`WEN_ADDR] i_mem_wen,
 		input wire [`INST_ADDR_WIDTH] i_bad_pc,
+		//input wire [5:0] i_int,
 
 		output reg o_mem_en,
 		output reg [31:0] o_exp_type,
-		output reg [`INST_ADDR_WIDTH] o_exp_pc,
+	    output reg [`INST_ADDR_WIDTH] o_exp_pc,
 		output reg [`REG_WIDTH] o_bad_addr,
 		output reg o_flush
     );
 
 	reg [`REG_WIDTH] cp0_status;
-	reg [`REG_WIDTH] cp0_cause;
+    reg [`REG_WIDTH] cp0_cause;
 	reg [`REG_WIDTH] cp0_epc;
 
 	/* get the newset cp0 data */
 	always
 		@(*) begin
-				if(i_wb_cp0_write == `CP0_WRITE && i_wb_rd_addr == `CP0_REG_STATUS && i_wb_cp0_sel == 3'b000) begin
+		        if(i_wb_cp0_write == `CP0_WRITE && i_wb_rd_addr == `CP0_REG_STATUS && i_wb_cp0_sel == 3'b000) begin
 						cp0_status <= i_wb_cp0_data;
 				end
 				else begin
@@ -120,12 +121,15 @@ module Exp_Handler(
 								o_bad_addr <= i_bad_pc;
 								o_exp_pc <= `EXP_DEFAULT_PC; 
 						end
+						//else begin
+						// avoid latch , but we have written the default code before
+						//end
 					end
 			end
 
 		always
 			@(*) begin
-				if(~(|o_exp_type) == 1'b0) begin //exception occur
+				if(|o_exp_type == 1'b1) begin //exception occur
 						o_mem_en <= `CHIP_DISABLE;
 						if(o_exp_type == `ALIGN_IF_READ_EXP_TYPE) begin
 								o_flush <= `NO_FLUSH;

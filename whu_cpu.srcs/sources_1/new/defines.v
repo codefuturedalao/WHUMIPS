@@ -124,6 +124,9 @@
 `define SRA_OPCODE 6'b000011
 `define SRLV_OPCODE 6'b000110
 `define SRL_OPCODE 6'b000010
+
+`define SPECIAL2_OPCODE 6'b011100
+`define MUL_OPCODE 6'b000010
 //jump
 `define JR_OPCODE 6'b001000
 `define JALR_OPCODE 6'b001001
@@ -231,6 +234,11 @@
 `define SH_ALU_OPCODE 6'b100111 //the same as LH
 `define SW_ALU_OPCODE 6'b101000 //the same as LW
 
+//privileged op
+`define ERET_ALU_OPCODE 6'b101001
+`define MFC0_ALU_OPCODE 6'b101010
+`define MTC0_ALU_OPCODE 6'b101011
+
 // HI/LO op
 `define MFHI_ALU_OPCODE 6'b101100
 `define MFLO_ALU_OPCODE 6'b101101
@@ -239,7 +247,6 @@
 // trap
 `define BREAK_ALU_OPCODE 6'b000000   //the same as nop
 `define SYS_ALU_OPCODE 6'b000000     //the same as nop
-//privileged op
-`define ERET_ALU_OPCODE 6'b101001
-`define MFC0_ALU_OPCODE 6'b101010
-`define MTC0_ALU_OPCODE 6'b101011
+
+
+`define MUL_ALU_OPCODE 6'b110000

@@ -42,11 +42,11 @@ module Axi_Controller(
 	input wire i_if_axi_stall,
 	input wire i_ce,
 	
-	input wire [`INST_ADDR_WIDTH] i_if_addr,
+	(*mark_debug = "true"*) input wire [`INST_ADDR_WIDTH] i_if_addr,
 	input wire i_if_en,
 	//input wire i_if_wen,
 	input wire [`INST_WIDTH] i_if_data,
-	output reg [`INST_WIDTH] o_if_data,
+	(*mark_debug = "true"*) output reg [`INST_WIDTH] o_if_data,
 
 	input wire [`REG_WIDTH] i_mem_addr,
 	input wire i_mem_en,
@@ -54,23 +54,23 @@ module Axi_Controller(
 	input wire [`REG_WIDTH] i_mem_data,
 	output reg [`REG_WIDTH] o_mem_data,
 
-	output reg [3:0] o_arid, 	//0 : fetch inst  1 : fetch data
-(*mark_debug = "true"*)	output reg [31:0] o_araddr,
+	(*mark_debug = "true"*) output reg [3:0] o_arid, 	//0 : fetch inst  1 : fetch data
+	(*mark_debug = "true"*)output reg [31:0] o_araddr,
 	output reg [3:0] o_arlen,
 	output reg [2:0] o_arsize,
 	output reg [1:0] o_arburst,
 	output reg [1:0] o_arlock,
 	output reg [3:0] o_arcache,
 	output reg [2:0] o_arprot,
-(*mark_debug = "true"*)	output reg o_arvalid,
-(*mark_debug = "true"*)	input wire i_arready,
+	(*mark_debug = "true"*)output reg o_arvalid,
+   (*mark_debug = "true"*) input wire i_arready,
 
-	input wire [3:0] i_rid,
-(*mark_debug = "true"*)	input wire [31:0] i_rdata,
-    input wire [1:0] i_rresp,
-	input wire i_rlast,
-(*mark_debug = "true"*)	input wire i_rvalid,
-(*mark_debug = "true"*)	output reg o_rready,
+	(*mark_debug = "true"*) input wire [3:0] i_rid,
+   (*mark_debug = "true"*) input wire [31:0] i_rdata,
+  (*mark_debug = "true"*)  input wire [1:0] i_rresp,
+(*mark_debug = "true"*)	input wire i_rlast,
+   (*mark_debug = "true"*) input wire i_rvalid,
+	(*mark_debug = "true"*)output reg o_rready,
 
 	output reg [3:0] o_awid,
 	output reg [31:0] o_awaddr,
@@ -95,14 +95,14 @@ module Axi_Controller(
 	input wire i_bvalid,
 	output reg o_bready,
 
-	output reg o_stall_req_from_if,
-	output reg o_stall_req_from_mem,
-	output reg o_if_read_result_flag,
-	output reg o_me_read_result_flag,
+	(*mark_debug = "true"*) output reg o_stall_req_from_if,
+	(*mark_debug = "true"*) output reg o_stall_req_from_mem,
+	(*mark_debug = "true"*) output reg o_if_read_result_flag,
+	(*mark_debug = "true"*) output reg o_me_read_result_flag,
 	output reg o_me_write_result_flag
     );
 
-	reg [3:0] r_status;
+	(*mark_debug = "true"*) reg [3:0] r_status;
 	//reg o_if_read_result_flag;		//0 : getting, 1: got
 	reg [2:0] w_status;
 
